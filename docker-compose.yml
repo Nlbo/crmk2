@@ -1,0 +1,59 @@
+
+services:
+  #Nginx Service
+  webserver:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    links:
+      - php
+    networks:
+      - app-network
+    volumes_from:
+      - php
+
+  php:
+    build:
+      context: './docker/app'
+    volumes:
+      - ./backend:/var/www/html
+    networks:
+      - app-network
+
+  #MySQL Service
+  db:
+    platform: linux/amd64
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    volumes:
+      - 'mysql:/var/lib/mysql'
+    networks:
+      - app-network
+  redis:
+    platform: linux/amd64
+    command: redis-server --requirepass password
+    volumes:
+      - ./redis:/data
+    image: 'redis:latest'
+    ports:
+      - '6379:6379'
+    networks:
+      - app-network
+
+#Docker Networks
+volumes:
+  mysql:
+    driver: local
+networks:
+  app-network:
+    driver: bridge

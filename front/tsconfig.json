@@ -1,0 +1,36 @@
+  /* To learn more about this file see: https://angular.io/config/tsconfig. */
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "es2020",
+    "lib": [
+      "es2018",
+      "dom",
+      "ES2020.String"
+    ],
+    "paths": {
+      "@shared/*": ["src/app/shared/*"],
+      "@environment/*": ["environments/*"],
+      "@styles/*": ["src/assets/styles/*"],
+      "@api/*": ["src/app/shared/api/*"],
+      "@enums/*": ["src/app/shared/enums/*"],
+      "@interfaces/*": ["src/app/shared/interfaces/*"],
+      "@models/*": ["src/app/shared/models/*"],
+      "@services/*": ["src/app/shared/services/*"],
+      "@components/*": ["src/app/shared/components/*"],
+      "@constants/*": ["src/app/shared/constants/*"],
+      "@directives/*": ["src/app/shared/directives/*"],
+      "@pipes/*": ["src/app/shared/pipes/*"],
+      "@pages/*": ["src/app/pages/*"]
+    }
+  }
+}

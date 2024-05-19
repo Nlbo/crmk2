@@ -1,0 +1,12 @@
+POST {{host}}/api/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+Accept: application/json
+Authorization: Bearer {{token}}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="file.txt"
+
+< http-client.private.env.json
+--WebAppBoundary--
+
+###

@@ -1,0 +1,48 @@
+stages:
+- build
+- notify
+
+build-dev:
+  stage: build
+  script:
+    - npm install
+    - npm run build:dev
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "rm -rf /home/crmk/crmk-frontend/*"
+    - scp -r dist/* root@$DEV_SERVER:/home/crmk/crmk-frontend
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "chown -R www-data:www-data /home/crmk/crmk-frontend"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "docker restart laradock_nginx_1"
+    - sh .ci-notify.sh ✅
+  only:
+   - develop
+
+build-stage:
+  stage: build
+  script:
+    - npm install
+    - npm run build:stage
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "rm -rf /home/crmk/crmk-frontend/*"
+    - scp -r dist/* root@$STAGE_SERVER:/home/crmk/crmk-frontend
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "chown -R www-data:www-data /home/crmk/crmk-frontend"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "docker restart laradock_nginx_1"
+    - sh .ci-notify.sh ✅
+  only:
+   - release
+
+build-live:
+  stage: build
+  script:
+    - npm install
+    - npm run build:prod
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "rm -rf /home/crmk/crmk-frontend/*"
+    - scp -r dist/* root@$PROD_SERVER:/home/crmk/crmk-frontend
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "chown -R www-data:www-data /home/crmk/crmk-frontend"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker restart laradock_nginx_1"
+    - sh .ci-notify.sh ✅
+  only:
+   - master
+
+notify_error:
+  stage: notify
+  script:
+  - sh .ci-notify.sh ❌
+  when: on_failure #deploy fail

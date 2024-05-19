@@ -1,0 +1,36 @@
+
+.chat-list-content {
+
+  ::ng-deep .ant-list-item-meta-content {
+    height: 60px;
+    overflow: hidden;
+  }
+
+  ::ng-deep .ant-list-item-meta-description {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  ::ng-deep .ant-list-item-meta-title {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  width: 100%;
+  height: auto;
+  border-bottom: 1px solid #ddd;
+
+  .chat-list-item {
+    cursor: pointer;
+
+    &:hover {
+      background: #fafafa;
+    }
+  }
+  .active {
+    background-color: #cfcfcf;
+  }
+  .blocked {
+    background-color: #ff000057!important;
+  }
+}

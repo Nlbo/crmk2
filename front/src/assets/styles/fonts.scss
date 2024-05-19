@@ -1,0 +1,19 @@
+@font-face {
+  font-family : 'AirbnbCereal-Book';
+  src         : url('../fonts/AirbnbCereal-Book.ttf') format('truetype');
+}
+
+@font-face {
+  font-family : 'Mardoto-Regular';
+  src         : url('../fonts/Mardoto-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family : 'PTC55F';
+  src         : url('../fonts/PTC55F.ttf') format('truetype');
+}
+
+* {
+  font-family : 'Mardoto-Regular', 'PTC55F', 'AirbnbCereal-Book' !important;
+}
+

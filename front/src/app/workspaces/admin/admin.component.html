@@ -1,0 +1,101 @@
+<nz-layout class="app-layout" [style.paddingLeft.px]="!isCollapsed ? 256 : 80">
+  <nz-sider class="menu-sidebar"
+            nzCollapsible
+            nzWidth="256px"
+            nzBreakpoint="md"
+            [(nzCollapsed)]="isCollapsed"
+            [nzTrigger]="null">
+    <div class="sidebar-logo">
+      <a  [routerLink]="['']">
+        <img src="assets/images/logo.svg" alt="logo">
+        <h1>CRMK</h1>
+      </a>
+    </div>
+    <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+      <ng-container *ngFor="let item of helperService.menuItems">
+        <ng-container [ngSwitch]="item.type">
+          <li *ngSwitchCase="menuItemTypeEnum.Button" nz-menu-item (click)="changeRoute(item.url)" [routerLink]="['/', item.url]" nzMatchRouter [appPermission]="item.permissions">
+            <i nz-icon [nzType]="item.icon"></i>
+            <span>{{ item.title | translate }}</span>
+          </li>
+          <li *ngSwitchCase="menuItemTypeEnum.Dropdown" nz-submenu [nzOpen]="router.url.includes('/' + item.url + '/')"
+              [nzTitle]="item.title | translate" [nzIcon]="item.icon" [appPermission]="item.permissions">
+            <ul>
+              <li *ngFor="let subItem of item.items" nz-menu-item nzMatchRouter [appPermission]="subItem.permissions">
+                <a [routerLink]="['/', item.url, subItem.url]">{{ subItem.title | translate }}</a>
+              </li>
+            </ul>
+          </li>
+        </ng-container>
+      </ng-container>
+    </ul>
+  </nz-sider>
+  <nz-layout>
+    <nz-header>
+      <div class="app-header G-flex-center-between"
+           [class.isCollapsedHeader]="isCollapsed"
+           [class.isNotCollapsedHeader]="!isCollapsed">
+        <span class="header-trigger G-flex-center-center">
+            <i class="trigger"
+               nz-icon
+               (click)="isCollapsed = !isCollapsed"
+               [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'">
+            </i>
+        </span>
+        <div class="G-pr-20px G-flex">
+          <div class="G-pr-20px G-flex-center-center">
+            <a nz-dropdown nzTrigger="click" [nzDropdownMenu]="language">
+              <img class="G-mr-10px P-flag" width="25" height="15"
+                   src="assets/images/languages/{{translateLocalService.language}}.png">
+              <i nz-icon nzType="down"></i>
+            </a>
+          </div>
+          <div class="G-flex-center-center">
+            <nz-avatar class="G-m-0px" nzIcon="user"></nz-avatar>
+            <a nz-dropdown nzTrigger="click" [nzDropdownMenu]="menu">
+               {{authHelperService.user?.email}}
+              <i nz-icon nzType="down"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </nz-header>
+    <nz-content>
+      <div class="inner-content" [class.inner-content-padding]="AppHelper.isInnerContentPadding">
+        <router-outlet></router-outlet>
+      </div>
+    </nz-content>
+  </nz-layout>
+</nz-layout>
+
+<nz-dropdown-menu #menu="nzDropdownMenu">
+  <ul nz-menu nzSelectable>
+    <li nz-menu-item class="G-capitalize" [routerLink]="['', 'settings', 'users', ManageTypesEnum.Edit, authHelperService.user.id]">
+      <i nz-icon nzType="user" nzTheme="outline"></i>
+      {{ 'myProfile' | translate }}
+    </li>
+    <li nz-menu-item class="G-capitalize" (click)="logOut()">
+      <i nz-icon nzType="logout" nzTheme="outline"></i>
+      {{ 'logOut' | translate }}
+    </li>
+  </ul>
+</nz-dropdown-menu>
+
+<nz-dropdown-menu #language="nzDropdownMenu">
+  <ul nz-menu nzSelectable>
+    <li
+      *ngIf="translateLocalService.language !== LanguageEnum.English"
+      nz-menu-item
+      (click)="onSelectLanguage(LanguageEnum.English)">
+      <img class="G-mr-10px P-flag" [width]="25" [height]="15" src="assets/images/languages/en.png">
+      English
+    </li>
+    <li
+      *ngIf="translateLocalService.language !== LanguageEnum.Russian"
+      nz-menu-item
+      (click)="onSelectLanguage(LanguageEnum.Russian)">
+      <img class="G-mr-10px P-flag" [width]="25" [height]="15" src="assets/images/languages/ru.png">
+      Русский
+    </li>
+  </ul>
+</nz-dropdown-menu>

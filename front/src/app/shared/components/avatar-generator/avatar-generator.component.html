@@ -1,0 +1,8 @@
+<div *ngIf="avatar" >
+  <img [style.borderRadius.%]="radius" [style.width.px]="width" [style.height.px]="height" [src]="avatar"  (error)="avatar = null">
+</div>
+<div *ngIf="!avatar">
+  <div class="avatar" [style.backgroundColor]="color" [style.borderRadius.%]="radius" [style.width.px]="width" [style.height.px]="height">
+    <span [style.fontSize.px]="fontSize">{{firstName ? (firstName[0] | uppercase) : ''}} {{lastName ? (lastName[0] | uppercase) : ''}}</span>
+  </div>
+</div>

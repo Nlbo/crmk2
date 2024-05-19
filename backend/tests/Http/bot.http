@@ -1,0 +1,12 @@
+GET {{host}}/api/telegram/bots
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+POST {{host}}/telegram/bots
+Content-Type: application/json
+
+{}
+
+###

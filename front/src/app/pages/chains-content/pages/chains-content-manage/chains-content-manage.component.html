@@ -1,0 +1,52 @@
+<nz-page-header class="G-capitalize" nzTitle="{{ 'manageChainsContentPreviewTitle' | translate }}" nzBackIcon
+                *ngIf="router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageChainsContentPreviewTitle' | translate }}</nz-page-header-title>
+</nz-page-header>
+
+<nz-page-header class="G-capitalize"
+                nzTitle="{{ 'manageChainsContentManageTitle' | translate: {manageType: ManageType | translate} }}"
+                *ngIf="!router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageChainsContentManageTitle' | translate: {manageType: ManageType | translate} }}</nz-page-header-title>
+</nz-page-header>
+
+<form [formGroup]="chainsContentManageModel.formGroup" (ngSubmit)="submitForm()">
+  <nz-form-item class="G-column G-flex-align-start">
+    <nz-form-label>{{'title' | translate}}</nz-form-label>
+    <nz-form-control class="G-w-100p" nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+      <input nz-input [formControl]="chainsContentManageModel.title"
+             [placeholder]="'manageChainsContentTitlePlaceholder' | translate" required/>
+    </nz-form-control>
+  </nz-form-item>
+  <div class="G-h-200px">
+    <app-text-editor
+      [formControl]="chainsContentManageModel.body"
+      [instrumentsContainerHeight]="60"
+      (addButtonTriggerEvent)="openButtonsModal()"
+      [selectedStickerId]="chainsContentManageModel.stickers.value"
+      [isClearUploadCareState]="false"
+      [isClearStickersState]="false"
+      [isVisibleButtonsContainer]="isVisibleButtonsContainer"
+      [isBotLinkBtn]="false"
+      [isDirectLink]="false"
+      [isExternalLinkBtn]="false"
+      [selectedAttachmentId]="chainsContentManageModel.attachmentId.value"
+      (selectSticker)="chainsContentManageModel.stickers.setValue($event.id)"
+      (sendAttachment)="chainsContentManageModel.attachments.setValue($event);chainsContentManageModel.attachmentId.setValue($event.file_id)">
+    </app-text-editor>
+  </div>
+  <div class="buttons-container" *ngIf="isVisibleButtonsContainer">
+    <app-link-types [isExternalLink]="false" [formControl]="chainsContentManageModel.buttons" (removeButton)="closeButtonsModal()"></app-link-types>
+  </div>
+  <div class="G-flex-justify-end G-mt-20px" *ngIf="ManageType !== ManageTypesEnum.Preview ">
+    <button nz-button
+            [appNavigateBack]="['', 'bots', this.chainsContentManageModel.telegramBotId.value, 'chains', this.chainsContentManageModel.chainId.value, 'content']">{{ 'cancel' | translate }}</button>
+    <button
+      nz-button
+      [nzLoading]="(isGettingOneChainContent$ | async) || isManagingChainContent"
+      [disabled]="chainsContentManageModel.formGroup.invalid || isManagingChainContent"
+      nzType="primary"
+      class="G-ml-5px">
+      {{ (ManageType === ManageTypesEnum.Add ? 'add' : 'edit') | translate }}
+    </button>
+  </div>
+</form>

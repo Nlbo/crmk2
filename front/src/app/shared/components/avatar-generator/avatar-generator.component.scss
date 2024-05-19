@@ -1,0 +1,9 @@
+.avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ddd;
+  span {
+    font-weight: bold;
+  }
+}

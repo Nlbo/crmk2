@@ -1,0 +1,69 @@
+<nz-tabset (nzSelectChange)="changeTab($event.index)" [(nzSelectedIndex)]="tabIndex" *ngIf="isEditingButton">
+  <i nz-icon nzType="check-circle" nzTheme="outline"></i>
+  <nz-tab [nzTitle]="'changeLink' | translate">
+    <ng-template nzModalContent [ngTemplateOutlet]="form"></ng-template>
+  </nz-tab>
+  <nz-tab *ngIf="isExternalLink" [nzTitle]="'externalLink' | translate">
+    <ng-template nzModalContent [ngTemplateOutlet]="form"></ng-template>
+  </nz-tab>
+  <nz-tab *ngIf="isDirectLink" [nzTitle]="'directLink' | translate">
+    <ng-template nzModalContent [ngTemplateOutlet]="form"></ng-template>
+  </nz-tab>
+</nz-tabset>
+
+
+<ng-template #form>
+  <form nz-form [formGroup]="formGroup" class="container" [nzLayout]="'vertical'">
+    <nz-form-item>
+      <nz-form-label>{{'text' | translate}}</nz-form-label>
+      <nz-form-control nzHasFeedback [nzErrorTip]="'requiredText' | translate">
+        <input nz-input formControlName="text" [placeholder]="'manageCharacterTitleInputPlaceholder' | translate"
+               required/>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label>{{'url' | translate}}</nz-form-label>
+      <nz-form-control nzHasFeedback [nzErrorTip]="'requiredUrl' | translate">
+        <input nz-input formControlName="url" [placeholder]="'manageCharacterTitleInputPlaceholder' | translate"
+               required/>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+</ng-template>
+
+  <div class="G-flex-justify-end G-mt-20px G-flex-align-center">
+      <span [style.color]="'#f5222d'"
+            *ngIf="formGroup.get('url').value !==
+            originalFormGroup.get('url').value ||
+            formGroup.get('text').value !==
+            originalFormGroup.get('text').value">
+        {{'notSaved' | translate}}
+      </span>
+    <button class="G-ml-5px" nz-button (click)="formGroup.patchValue(originalFormGroup.value);isEditingButton = false">{{ 'cancel' | translate }}</button>
+    <button
+      *ngIf="isEditingButton &&
+        formGroup.get('url').value !==
+        originalFormGroup.get('url').value ||
+        formGroup.get('text').value !==
+        originalFormGroup.get('text').value"
+      nz-button
+      (click)="save()"
+      [disabled]="(formGroup.get('url').value ===
+        originalFormGroup.get('url').value &&
+        formGroup.get('text').value ===
+        originalFormGroup.get('text').value) || formGroup.invalid"
+      nzType="primary"
+      class="G-ml-5px">
+      {{ 'save' | translate }}
+    </button>
+  </div>
+
+<div [class.not-allowed]="isDisabled">
+  <div class="P-button" *ngIf="!isEditingButton" [class.disabled]="isDisabled">
+    <i *ngIf="!isDisabled" class="G-fs-15px edit-icon" nz-icon nzType="edit" nzTheme="outline"
+       (click)="isEditingButton = true;"></i>
+    <p class="G-w-70p">{{originalFormGroup.value.text}}</p>
+    <i *ngIf="!isDisabled" (click)="removeButtonEvent.emit()" class="G-fs-15px remove-icon" nz-icon nzType="close"
+       nzTheme="outline"></i>
+  </div>
+</div>

@@ -1,0 +1,94 @@
+<div class="G-flex-center-between G-mb-20px">
+  <h2>
+    {{'categories' | translate}} {{ 'total' | translate }}: {{ categoriesResponse?.total }}
+  </h2>
+  <a
+    [appPermission]="[PermissionsEnum.CreateCategory]"
+    [routerLink]="['', 'dictionaries', 'categories', ManageTypesEnum.Add]"
+    nz-button
+    nzType="primary">
+    <i nz-icon nzType="plus-circle" nzTheme="outline"></i>
+    {{ 'add' | translate }}
+  </a>
+</div>
+<nz-table #nzTable
+          [nzScroll]="{ x: '1100px' }"
+          nzShowPagination
+          [nzData]="categoriesList"
+          nzTableLayout="fixed"
+          [nzPageSize]="pageSize"
+          [nzTotal]="categoriesResponse?.total"
+          [nzFrontPagination]="false"
+          (nzPageIndexChange)="pageIndex = $event;initializeValues()"
+          [nzPageIndex]="pageIndex">
+  <thead>
+  <tr>
+    <th nzCustomFilter>
+      {{'title' | translate}}
+      <nz-filter-trigger
+        [(nzVisible)]="visibleTitleFilter"
+        [nzActive]="categoriesService.titleFilter.length > 0"
+        [nzDropdownMenu]="titleFilter">
+        <i nz-icon nzType="search"></i>
+      </nz-filter-trigger>
+    </th>
+    <th>{{'created_at' | translate}}</th>
+    <th>{{'updated_at' | translate}}</th>
+    <th nzWidth="200px" class="G-text-align-center">{{'actions' | translate}}</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let category of nzTable.data">
+    <td nzEllipsis [nz-tooltip]="category.title">{{ category.title }}</td>
+    <td>{{ category.created_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+    <td>{{ category.updated_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+    <td>
+      <div class="P-actions G-flex-justify-center">
+        <button
+          [appPermission]="[PermissionsEnum.UpdateCategory, PermissionsEnum.ViewCategory]"
+          nz-button
+          nzType="default"
+          [routerLink]="['', 'dictionaries', 'categories', ManageTypesEnum.Edit, category.id]">
+          <i nz-icon nzType="edit" nzTheme="outline"></i>
+        </button>
+        <button
+          [appPermission]="[PermissionsEnum.DeleteCategory]"
+          nzPopconfirmPlacement="right"
+          [nzPopconfirmTitle]="'deleteCategoryPopupText' | translate"
+          nz-popconfirm
+          nz-button
+          nzType="default"
+          nzDanger
+          (nzOnConfirm)="deleteCategory(category.id)">
+          <i nz-icon nzType="delete" nzTheme="outline"></i>
+        </button>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</nz-table>
+
+
+<nz-dropdown-menu #titleFilter="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown">
+    <div class="search-box">
+      <input
+        type="text"
+        nz-input
+        [placeholder]="'searchTitle' | translate"
+        [(ngModel)]="categoriesService.titleFilter"
+        (keydown.enter)="pageIndex = 0;initializeValues()">
+      <button nz-button nzSize="small"
+              nzType="primary"
+              (click)="pageIndex = 0;
+               initializeValues()"
+              class="search-button">
+        {{ 'search' | translate }}
+      </button>
+      <button
+        nz-button
+        nzSize="small"
+        (click)="categoriesService.titleFilter = '';initializeValues()">{{ 'reset' | translate }}</button>
+    </div>
+  </div>
+</nz-dropdown-menu>

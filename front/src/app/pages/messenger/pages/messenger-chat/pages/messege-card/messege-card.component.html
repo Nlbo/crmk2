@@ -1,0 +1,106 @@
+<ng-container *ngIf="chat && botId">
+  <ng-container [ngSwitch]="chat.type">
+    <ng-container *ngSwitchCase="MessageTypeEnum.TEXT">
+      <div>
+        <div class="d-flex" [style.textAlign]="botId !== chat.from_id ? 'start' : 'end'">
+                    <span class="text-small text-muted">
+                      <b [style.color]="'black'" *ngIf="chat.user">{{chat.user.name}}</b>
+                      <br *ngIf="chat.user">
+                      <i>{{chat.created_at | date: 'dd/MM/yyy HH:mm' : '+0300'}}</i>
+                    </span>
+        </div>
+        <div class="m-0" [innerHTML]="chat.text"></div>
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="MessageTypeEnum.STICKER">
+      <div class="d-flex" [style.textAlign]="botId === chat.from_id ? 'start' : 'end'">
+                    <span class="text-small text-muted">
+                      <i>{{chat.created_at | date: 'dd/MM/yyy HH:mm' : '+0300'}}</i>
+                    </span>
+      </div>
+      <div class="sticker">
+        <img [src]="chat.sticker?.converted_url ? chat.sticker?.converted_url : chat.sticker?.file_url ? chat.sticker?.file_url : 'assets/images/default_sticker.png'" (error)="$event.target['src'] = 'assets/images/default_sticker.png'" alt="">
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="MessageTypeEnum.ATTACHMENT">
+      <ng-container *ngFor="let attachment of chat.attachments">
+        <ng-container [ngSwitch]="attachment?.type">
+          <ng-container *ngSwitchCase="MessageAttachmentTypeEnum.Animation">
+            <div class="d-flex" [style.textAlign]="botId === chat.from_id ? 'start' : 'end'">
+                    <span class="text-small text-muted">
+                      <i>{{chat.created_at | date: 'dd/MM/yyy HH:mm' : '+0300'}}</i>
+                    </span>
+            </div>
+            <div class="document">
+              <img [src]="attachment.file_url" alt="">
+            </div>
+          </ng-container>
+          <ng-container *ngSwitchCase="MessageAttachmentTypeEnum.Audio">
+            <div class="d-flex" [style.textAlign]="botId === chat.from_id ? 'start' : 'end'">
+                    <span class="text-small text-muted">
+                      <i>{{chat.created_at | date: 'dd/MM/yyy HH:mm' : '+0300'}}</i>
+                    </span>
+            </div>
+            <audio controls>
+              <source [src]="attachment.file_url" type="video/mp4">
+            </audio>
+          </ng-container>
+          <ng-container *ngSwitchCase="MessageAttachmentTypeEnum.Photo">
+            <div class="d-flex" [style.textAlign]="botId === chat.from_id ? 'start' : 'end'">
+                    <span class="text-small text-muted">
+                      <i>{{chat.created_at | date: 'dd/MM/yyy HH:mm' : '+0300'}}</i>
+                    </span>
+            </div>
+            <div class="document">
+              <img [src]="attachment.file_url" alt="">
+            </div>
+          </ng-container>
+          <ng-container *ngSwitchCase="MessageAttachmentTypeEnum.Video">
+            <div class="video">
+              <div class="d-flex" [style.textAlign]="botId === chat.from_id ? 'start' : 'end'">
+                    <span class="text-small text-muted">
+                      <i>{{chat.created_at | date: 'dd/MM/yyy HH:mm' : '+0300'}}</i>
+                    </span>
+              </div>
+              <video width="400" controls>
+                <source [src]="attachment.file_url" type="video/mp4">
+              </video>
+            </div>
+          </ng-container>
+          <ng-container *ngSwitchCase="MessageAttachmentTypeEnum.VideoNote">
+            <div class="video">
+              <div class="d-flex" [style.textAlign]="botId === chat.from_id ? 'start' : 'end'">
+                    <span class="text-small text-muted">
+                      <i>{{chat.created_at | date: 'dd/MM/yyy HH:mm' : '+0300'}}</i>
+                    </span>
+              </div>
+              <video width="400px" height="400px" loop autoplay muted class="video-element">
+                <source [src]="attachment.file_url" type="video/mp4">
+              </video>
+            </div>
+          </ng-container>
+          <ng-container *ngSwitchCase="MessageAttachmentTypeEnum.Document">
+            <div class="d-flex" [style.textAlign]="botId === chat.from_id ? 'start' : 'end'">
+                    <span class="text-small text-muted">
+                      <i>{{chat.created_at | date: 'dd/MM/yyy HH:mm' : '+0300'}}</i>
+                    </span>
+            </div>
+            <div class="document">
+              <img src="assets/images/document.jpg" alt="">
+            </div>
+          </ng-container>
+          <ng-container *ngSwitchCase="MessageAttachmentTypeEnum.Voice">
+            <div class="d-flex" [style.textAlign]="botId === chat.from_id ? 'start' : 'end'">
+                    <span class="text-small text-muted">
+                      <i>{{chat.created_at | date: 'dd/MM/yyy HH:mm' : '+0300'}}</i>
+                    </span>
+            </div>
+            <audio controls>
+              <source [src]="attachment.file_url" type="audio/mpeg">
+            </audio>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</ng-container>

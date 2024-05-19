@@ -1,0 +1,144 @@
+<div class="G-flex-center-between G-mb-20px">
+  <h2>
+    {{'customers' | translate}} {{ 'total' | translate }}: {{ customersResponse?.total }}
+  </h2>
+</div>
+<nz-table #nzTable
+          [nzScroll]="{ x: '1100px' }"
+          nzShowPagination
+          [nzData]="customersList"
+          nzTableLayout="fixed"
+          [nzPageSize]="pageSize"
+          [nzTotal]="customersResponse?.total"
+          [nzFrontPagination]="false"
+          (nzPageIndexChange)="pageIndex = $event;initializeValues()"
+          [nzPageIndex]="pageIndex">
+  <thead>
+  <tr>
+    <th>{{'avatar' | translate}}</th>
+    <th nzCustomFilter>
+      {{'username' | translate}}
+      <nz-filter-trigger
+        [(nzVisible)]="visibleUsernameFilter"
+        [nzActive]="customersService.usernameFilter.length > 0"
+        [nzDropdownMenu]="usernameFilter">
+        <i nz-icon nzType="search"></i>
+      </nz-filter-trigger>
+    </th>
+    <th>{{'language' | translate}}</th>
+    <th nzCustomFilter>
+      <nz-filter-trigger
+        [(nzVisible)]="visibleFirstNameFilter"
+        [nzActive]="customersService.firstNameFilter.length > 0"
+        [nzDropdownMenu]="firstNameFilter">
+        <i nz-icon nzType="search"></i>
+      </nz-filter-trigger>
+      {{'firstName' | translate}}
+    </th>
+    <th nzCustomFilter>
+      <nz-filter-trigger
+        [(nzVisible)]="visibleLastNameFilter"
+        [nzActive]="customersService.lastNameFilter.length > 0"
+        [nzDropdownMenu]="lastNameFilter">
+        <i nz-icon nzType="search"></i>
+      </nz-filter-trigger>
+      {{'lastName' | translate}}
+    </th>
+    <th>{{'created_at' | translate}}</th>
+    <th>{{'updated_at' | translate}}</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let chat of nzTable.data">
+    <td appCursor [routerLink]="['', 'messenger', 'chats', chat.id]" nzEllipsis
+        [nz-tooltip]="chat.username">
+      <app-avatar-generator [setLocalStorageColorById]="chat.id" [firstName]="chat.first_name" [lastName]="chat.last_name" [avatar]="chat.avatar?.file_url"></app-avatar-generator>
+    </td>
+    <td appCursor [routerLink]="['', 'messenger', 'chats', chat.id]" nzEllipsis
+        [nz-tooltip]="chat.username">{{ chat.username }}</td>
+    <td appCursor [routerLink]="['', 'messenger', 'chats', chat.id]" nzEllipsis
+        [nz-tooltip]="chat.language_code">{{ chat.language_code }}</td>
+    <td appCursor [routerLink]="['', 'messenger', 'chats', chat.id]" nzEllipsis
+        [nz-tooltip]="chat.first_name">{{ chat.first_name }}</td>
+    <td appCursor [routerLink]="['', 'messenger', 'chats', chat.id]" nzEllipsis
+        [nz-tooltip]="chat.last_name">{{ chat.last_name }}</td>
+    <td appCursor
+        [routerLink]="['', 'messenger', 'chats', chat.id]">{{ chat.created_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+    <td appCursor
+        [routerLink]="['', 'messenger', 'chats', chat.id]">{{ chat.updated_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+  </tr>
+  </tbody>
+</nz-table>
+
+<nz-dropdown-menu #usernameFilter="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown">
+    <div class="search-box">
+      <input
+        type="text"
+        nz-input
+        [placeholder]="'searchUsername' | translate"
+        [(ngModel)]="customersService.usernameFilter"
+        (keydown.enter)="pageIndex = 0;initializeValues()">
+      <button nz-button nzSize="small"
+              nzType="primary"
+              (click)="pageIndex = 0;
+               initializeValues()"
+              class="search-button">
+        {{ 'search' | translate }}
+      </button>
+      <button
+        nz-button
+        nzSize="small"
+        (click)="customersService.usernameFilter = '';initializeValues()">{{ 'reset' | translate }}</button>
+    </div>
+  </div>
+</nz-dropdown-menu>
+
+<nz-dropdown-menu #firstNameFilter="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown">
+    <div class="search-box">
+      <input
+        type="text"
+        nz-input
+        [placeholder]="'searchFirstName' | translate"
+        [(ngModel)]="customersService.firstNameFilter"
+        (keydown.enter)="pageIndex = 0;initializeValues()">
+      <button nz-button nzSize="small"
+              nzType="primary"
+              (click)="pageIndex = 0;
+               initializeValues()"
+              class="search-button">
+        {{ 'search' | translate }}
+      </button>
+      <button
+        nz-button
+        nzSize="small"
+        (click)="customersService.firstNameFilter = '';initializeValues()">{{ 'reset' | translate }}</button>
+    </div>
+  </div>
+</nz-dropdown-menu>
+
+<nz-dropdown-menu #lastNameFilter="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown">
+    <div class="search-box">
+      <input
+        type="text"
+        nz-input
+        [placeholder]="'searchLastName' | translate"
+        [(ngModel)]="customersService.lastNameFilter"
+        (keydown.enter)="pageIndex = 0;initializeValues()">
+      <button nz-button nzSize="small"
+              nzType="primary"
+              (click)="pageIndex = 0;
+               initializeValues()"
+              class="search-button">
+        {{ 'search' | translate }}
+      </button>
+      <button
+        nz-button
+        nzSize="small"
+        (click)="customersService.lastNameFilter = '';initializeValues()">{{ 'reset' | translate }}</button>
+    </div>
+  </div>
+</nz-dropdown-menu>
+

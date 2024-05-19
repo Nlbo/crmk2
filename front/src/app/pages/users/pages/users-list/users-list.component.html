@@ -1,0 +1,64 @@
+<div class="G-flex-center-between G-mb-20px">
+  <h2>
+    {{'users' | translate}} {{ 'total' | translate }}: {{ usersResponse?.total }}
+  </h2>
+  <a
+    [appPermission]="[PermissionsEnum.InviteUsers]"
+    [routerLink]="['', 'settings', 'users', ManageTypesEnum.Add]"
+    nz-button
+    nzType="primary">
+    <i nz-icon nzType="plus-circle" nzTheme="outline"></i>
+    {{ 'add' | translate }}
+  </a>
+</div>
+<nz-table #nzTable
+          [nzScroll]="{ x: '1100px' }"
+          nzShowPagination
+          [nzData]="usersList"
+          nzTableLayout="fixed"
+          [nzPageSize]="pageSize"
+          [nzTotal]="usersResponse?.total"
+          [nzFrontPagination]="false"
+          (nzPageIndexChange)="pageIndex = $event;initializeValues()"
+          [nzPageIndex]="pageIndex">
+  <thead>
+  <tr>
+    <th>{{'name' | translate}}</th>
+    <th>{{'email' | translate}}</th>
+    <th>{{'created_at' | translate}}</th>
+    <th>{{'updated_at' | translate}}</th>
+    <th nzWidth="200px" class="G-text-align-center">{{'actions' | translate}}</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let user of nzTable.data">
+    <td nzEllipsis [nz-tooltip]="user.name">{{ user.name }}</td>
+    <td nzEllipsis [nz-tooltip]="user.email">{{ user.email }}</td>
+    <td>{{ user.created_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+    <td>{{ user.updated_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+    <td>
+      <div class="P-actions G-flex-justify-center">
+        <button
+          [appPermission]="[PermissionsEnum.UpdateUsers]"
+          nz-button
+          nzType="default"
+          [routerLink]="['', 'settings', 'users', ManageTypesEnum.Edit, user.id]">
+          <i nz-icon nzType="edit" nzTheme="outline"></i>
+        </button>
+        <button
+          [appPermission]="[PermissionsEnum.DeleteUsers]"
+          nzPopconfirmPlacement="right"
+          [nzPopconfirmTitle]="'deleteBotPopupText' | translate"
+          nz-popconfirm
+          nz-button
+          nzType="default"
+          nzDanger
+          (nzOnConfirm)="deleteUser(user.id)">
+          <i nz-icon nzType="delete" nzTheme="outline"></i>
+        </button>
+      </div>
+    </td>
+
+  </tr>
+  </tbody>
+</nz-table>

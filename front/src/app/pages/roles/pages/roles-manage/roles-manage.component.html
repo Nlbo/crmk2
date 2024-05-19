@@ -1,0 +1,41 @@
+<nz-page-header class="G-capitalize" nzTitle="{{ 'manageRolesPreviewTitle' | translate }}" nzBackIcon
+                *ngIf="router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageRolesPreviewTitle' | translate }}</nz-page-header-title>
+</nz-page-header>
+
+<nz-page-header class="G-capitalize"
+                nzTitle="{{ 'manageRolesManageTitle' | translate: {manageType: ManageType | translate} }}"
+                *ngIf="!router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageRolesManageTitle' | translate: {manageType: ManageType | translate} }}</nz-page-header-title>
+</nz-page-header>
+
+<form nz-form [nzLayout]="'vertical'" [formGroup]="rolesManageModel.formGroup" (ngSubmit)="submitForm()">
+  <div class="G-flex-justify-between G-column">
+      <nz-form-item class="G-w-100p">
+        <nz-form-label>{{'title' | translate}}</nz-form-label>
+        <nz-form-control class="G-w-100p" nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+          <input nz-input formControlName="name" [placeholder]="'manageRolesTitlePlaceholder' | translate" required/>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="G-w-100p">
+        <nz-form-label>{{ 'permissions' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+          <nz-select nzShowSearch nzMode="multiple" [nzPlaceHolder]="'manageRolesPermissionsSelectPlaceholder' | translate" formControlName="permissions">
+            <nz-option *ngFor="let permissions of permissionsList" [nzValue]="permissions.id" [nzLabel]="permissions.description"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  <div class="G-flex-justify-end G-mt-20px" *ngIf="ManageType !== ManageTypesEnum.Preview ">
+    <button nz-button
+            [appNavigateBack]="['', 'settings', 'roles']">{{ 'cancel' | translate }}</button>
+    <button
+      nz-button
+      [nzLoading]="(isGettingOneRole$ | async) || isManagingRole"
+      [disabled]="rolesManageModel.formGroup.invalid || isManagingRole"
+      nzType="primary"
+      class="G-ml-5px">
+      {{ (ManageType === ManageTypesEnum.Add ? 'add' : 'edit') | translate }}
+    </button>
+  </div>
+</form>

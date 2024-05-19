@@ -1,0 +1,17 @@
+<div class="G-flex-center-between" *ngIf="customer">
+  <h2 class="G-flex-align-center">
+    <app-avatar-generator [color]="getLocalStorageItem(customer.id)" [setLocalStorageColorById]="customer?.id" [firstName]="customer?.first_name" [lastName]="customer?.last_name" [avatar]="customer?.avatar?.file_url"></app-avatar-generator>
+    <span class="G-ml-20px">{{customer?.username}}</span>
+  </h2>
+</div>
+<div class="container">
+  <div class="chat-list">
+    <app-customer-chats-list></app-customer-chats-list>
+  </div>
+  <div class="messenger">
+    <div class="messenger-container" *ngIf="chatId">
+      <router-outlet></router-outlet>
+    </div>
+    <nz-result class="no-sms-result" nzStatus="404" *ngIf="!chatId"></nz-result>
+  </div>
+</div>

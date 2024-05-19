@@ -1,0 +1,71 @@
+<div class="G-flex-center-between G-mb-20px">
+  <h2>
+    {{'roles' | translate}} {{ 'total' | translate }}: {{ rolesResponse?.total }}
+  </h2>
+  <a
+    [appPermission]="[PermissionsEnum.ManageRolesAndPermissions]"
+    [routerLink]="['', 'settings', 'roles', ManageTypesEnum.Add]"
+    nz-button
+    nzType="primary">
+    <i nz-icon nzType="plus-circle" nzTheme="outline"></i>
+    {{ 'add' | translate }}
+  </a>
+</div>
+<nz-table #nzTable
+          [nzScroll]="{ x: '1100px' }"
+          nzShowPagination
+          [nzData]="rolesList"
+          nzTableLayout="fixed"
+          [nzPageSize]="pageSize"
+          [nzTotal]="rolesResponse?.total"
+          [nzFrontPagination]="false"
+          (nzPageIndexChange)="pageIndex = $event;initializeValues()"
+          [nzPageIndex]="pageIndex">
+  <thead>
+  <tr>
+    <th>{{'name' | translate}}</th>
+    <th>{{'permissions' | translate}}</th>
+    <th>{{'created_at' | translate}}</th>
+    <th>{{'updated_at' | translate}}</th>
+    <th nzWidth="200px" class="G-text-align-center">{{'actions' | translate}}</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let role of nzTable.data">
+    <td nzEllipsis [nz-tooltip]="role.name">{{ role.name }}</td>
+    <td nzEllipsis [nz-tooltip]="permissionsContainer" [nzTooltipColor]="'white'">
+      <ng-container [ngTemplateOutlet]="permissionsContainer"></ng-container>
+      <ng-template #permissionsContainer>
+        <nz-tag class="G-mt-5px" *ngFor="let tag of role.permissions; let i = index" [nzMode]="'default'">
+          {{ tag.description }}
+        </nz-tag>
+      </ng-template>
+    </td>
+    <td>{{ role.created_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+    <td>{{ role.updated_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+    <td>
+      <div class="P-actions G-flex-justify-center">
+        <button
+          [appPermission]="[PermissionsEnum.ManageRolesAndPermissions]"
+          nz-button
+          nzType="default"
+          [routerLink]="['', 'settings', 'roles', ManageTypesEnum.Edit, role.id]">
+          <i nz-icon nzType="edit" nzTheme="outline"></i>
+        </button>
+        <button
+          [appPermission]="[PermissionsEnum.ManageRolesAndPermissions]"
+          nzPopconfirmPlacement="right"
+          [nzPopconfirmTitle]="'deleteRolePopupText' | translate"
+          nz-popconfirm
+          nz-button
+          nzType="default"
+          nzDanger
+          (nzOnConfirm)="deleteRole(role.id)">
+          <i nz-icon nzType="delete" nzTheme="outline"></i>
+        </button>
+      </div>
+    </td>
+
+  </tr>
+  </tbody>
+</nz-table>

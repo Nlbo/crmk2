@@ -1,0 +1,12 @@
+POST {{host}}/api/posts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "title": "My first post",
+    "body": "This is my first post",
+    "format": "HTML",
+  "language_id": ""
+}
+
+###

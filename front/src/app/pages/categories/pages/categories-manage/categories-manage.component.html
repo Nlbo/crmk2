@@ -1,0 +1,27 @@
+<nz-page-header class="G-capitalize" nzTitle="{{ 'manageCategoriesPreviewTitle' | translate }}" nzBackIcon *ngIf="router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageCategoriesPreviewTitle' | translate }}</nz-page-header-title>
+</nz-page-header>
+
+<nz-page-header class="G-capitalize" nzTitle="{{ 'manageCategoriesManageTitle' | translate: {manageType: ManageType | translate} }}" *ngIf="!router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageCategoriesManageTitle' | translate: {manageType: ManageType | translate} }}</nz-page-header-title>
+</nz-page-header>
+
+<form nz-form [formGroup]="manageCategoryModel.formGroup" [nzLayout]="'vertical'" (ngSubmit)="submitForm()">
+  <nz-form-item>
+    <nz-form-label>{{'title' | translate}}</nz-form-label>
+    <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+      <input nz-input formControlName="title" [placeholder]="'manageCategoryTitleInputPlaceholder' | translate" required />
+    </nz-form-control>
+  </nz-form-item>
+  <div class="G-flex-justify-end" *ngIf="ManageType !== ManageTypesEnum.Preview ">
+    <button nz-button [appNavigateBack]="['', 'dictionaries', 'categories']">{{ 'cancel' | translate }}</button>
+    <button
+      nz-button
+      [nzLoading]="(isGettingOneCategory$ | async) || isManagingCategory"
+      [disabled]="manageCategoryModel.formGroup.invalid || isManagingCategory"
+      nzType="primary"
+      class="G-ml-5px">
+      {{ (ManageType === ManageTypesEnum.Add ? 'add' : 'edit') | translate }}
+    </button>
+  </div>
+</form>

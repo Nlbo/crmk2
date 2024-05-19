@@ -1,0 +1,94 @@
+<div class="G-flex-center-between G-mb-20px">
+  <h2>
+    {{'characters' | translate}} {{ 'total' | translate }}: {{ charactersResponse?.total }}
+  </h2>
+  <a
+    [appPermission]="[PermissionsEnum.CreateCharacter]"
+    [routerLink]="['', 'dictionaries', 'characters', ManageTypesEnum.Add]"
+    nz-button
+    nzType="primary">
+    <i nz-icon nzType="plus-circle" nzTheme="outline"></i>
+    {{ 'add' | translate }}
+  </a>
+</div>
+<nz-table #nzTable
+          [nzScroll]="{ x: '1100px' }"
+          nzShowPagination
+          [nzData]="charactersList"
+          nzTableLayout="fixed"
+          [nzPageSize]="pageSize"
+          [nzTotal]="charactersResponse?.total"
+          [nzFrontPagination]="false"
+          (nzPageIndexChange)="pageIndex = $event;initializeValues()"
+          [nzPageIndex]="pageIndex">
+  <thead>
+  <tr>
+    <th nzCustomFilter>
+      {{'title' | translate}}
+      <nz-filter-trigger
+        [(nzVisible)]="visibleTitleFilter"
+        [nzActive]="charactersService.titleFilter.length > 0"
+        [nzDropdownMenu]="titleFilter">
+        <i nz-icon nzType="search"></i>
+      </nz-filter-trigger>
+    </th>
+    <th>{{'created_at' | translate}}</th>
+    <th>{{'updated_at' | translate}}</th>
+    <th nzWidth="200px" class="G-text-align-center">{{'actions' | translate}}</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let bot of nzTable.data">
+    <td nzEllipsis [nz-tooltip]="bot.title">{{ bot.title }}</td>
+    <td>{{ bot.created_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300'}}</td>
+    <td>{{ bot.updated_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+    <td>
+      <div class="P-actions G-flex-justify-center">
+        <button
+          [appPermission]="[PermissionsEnum.ViewCharacter, PermissionsEnum.UpdateCharacter]"
+          nz-button
+          nzType="default"
+          [routerLink]="['', 'dictionaries', 'characters', ManageTypesEnum.Edit, bot.id]">
+          <i nz-icon nzType="edit" nzTheme="outline"></i>
+        </button>
+        <button
+          [appPermission]="[PermissionsEnum.DeleteCharacter]"
+          nzPopconfirmPlacement="right"
+          [nzPopconfirmTitle]="'deleteCharactersPopupText' | translate"
+          nz-popconfirm
+          nz-button
+          nzType="default"
+          nzDanger
+          (nzOnConfirm)="deleteCharacter(bot.id)">
+          <i nz-icon nzType="delete" nzTheme="outline"></i>
+        </button>
+      </div>
+    </td>
+
+  </tr>
+  </tbody>
+</nz-table>
+
+<nz-dropdown-menu #titleFilter="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown">
+    <div class="search-box">
+      <input
+        type="text"
+        nz-input
+        [placeholder]="'searchTitle' | translate"
+        [(ngModel)]="charactersService.titleFilter"
+        (keydown.enter)="pageIndex = 0;initializeValues()">
+      <button nz-button nzSize="small"
+              nzType="primary"
+              (click)="pageIndex = 0;
+               initializeValues()"
+              class="search-button">
+        {{ 'search' | translate }}
+      </button>
+      <button
+        nz-button
+        nzSize="small"
+        (click)="charactersService.titleFilter = '';initializeValues()">{{ 'reset' | translate }}</button>
+    </div>
+  </div>
+</nz-dropdown-menu>

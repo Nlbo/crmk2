@@ -1,0 +1,79 @@
+<nz-page-header class="G-capitalize" nzTitle="{{ 'manageUsersPreviewTitle' | translate }}" nzBackIcon
+                *ngIf="router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageUsersPreviewTitle' | translate }}</nz-page-header-title>
+</nz-page-header>
+
+<nz-page-header class="G-capitalize"
+                nzTitle="{{ 'manageUserManageTitle' | translate: {manageType: ManageType | translate} }}"
+                *ngIf="!router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageUserManageTitle' | translate: {manageType: ManageType | translate} }}</nz-page-header-title>
+</nz-page-header>
+
+<form nz-form [nzLayout]="'vertical'" (ngSubmit)="submitForm()" [formGroup]="usersManageModel.formGroup">
+  <nz-form-item class="G-w-100p">
+    <nz-form-label>{{'name' | translate}}</nz-form-label>
+    <nz-form-control class="G-w-100p" nzHasFeedback [nzErrorTip]="'requiredName' | translate">
+      <input nz-input formControlName="name"
+             [placeholder]="'manageUsersNamePlaceholder' | translate"
+             required/>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item class="G-w-100p">
+    <nz-form-label>{{'email' | translate}}</nz-form-label>
+    <nz-form-control class="G-w-100p" nzHasFeedback [nzErrorTip]="'requiredEmail' | translate">
+      <input nz-input formControlName="email"
+             [placeholder]="'manageUsersEmailPlaceholder' | translate"
+             required/>
+    </nz-form-control>
+  </nz-form-item>
+
+
+  <nz-form-item class="G-w-100p" [appPermission]="[PermissionsEnum.ManageRolesAndPermissions]">
+    <nz-form-label>{{ 'roles' | translate }}</nz-form-label>
+    <nz-form-control nzHasFeedback>
+      <nz-select nzShowSearch nzMode="multiple" formControlName="roles" [nzPlaceHolder]="'manageUsersRolesSelectPlaceholder' | translate">
+        <nz-option *ngFor="let role of rolesList" [nzValue]="role.id" [nzLabel]="role.name"></nz-option>
+      </nz-select>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item class="G-w-100p" [appPermission]="[PermissionsEnum.ManageRolesAndPermissions]">
+    <nz-form-label>{{ 'permissions' | translate }}</nz-form-label>
+    <nz-form-control nzHasFeedback>
+      <nz-select nzShowSearch nzMode="multiple" [nzPlaceHolder]="'manageUsersPermissionsSelectPlaceholder' | translate" formControlName="permissions">
+        <nz-option *ngFor="let permission of permissionsList" [nzValue]="permission.id"
+                   [nzLabel]="permission.description"></nz-option>
+      </nz-select>
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item class="G-w-100p">
+    <nz-form-label>{{'password' | translate}}</nz-form-label>
+    <nz-switch class="G-mb-20px" [(ngModel)]="isEditPassword" [ngModelOptions]="{standalone: true}"></nz-switch>
+    <nz-form-control *ngIf="isEditPassword" class="G-w-100p" nzHasFeedback [nzErrorTip]="'requiredPassword' | translate">
+      <nz-input-group [nzSuffix]="suffixTemplate">
+        <input nz-input [type]="passwordVisible ? 'text' : 'password'" formControlName="password"
+               [placeholder]="'manageUsersPasswordPlaceholder' | translate"
+               required/>
+      </nz-input-group>
+      <ng-template #suffixTemplate>
+        <i nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+           (click)="passwordVisible = !passwordVisible"></i>
+      </ng-template>
+    </nz-form-control>
+  </nz-form-item>
+
+  <div class="G-flex-justify-end G-mt-20px" *ngIf="ManageType !== ManageTypesEnum.Preview ">
+    <button nz-button
+            [appNavigateBack]="['', 'settings', 'users']">{{ 'cancel' | translate }}</button>
+    <button
+      nz-button
+      [nzLoading]="(isGettingOneUser$ | async) || isManagingUser"
+      [disabled]="isManagingUser"
+      nzType="primary"
+      class="G-ml-5px">
+      {{ (ManageType === ManageTypesEnum.Add ? 'save' : 'edit') | translate }}
+    </button>
+  </div>
+</form>

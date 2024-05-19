@@ -1,0 +1,201 @@
+<div [class.not-allowed]="isDisabled" [style.width.%]="100" [style.height.%]="100">
+  <div class="container" [style.border]="border" [class.disabled]="isDisabled"
+       [class.max-symbol-length]="(previewHTML | htmlTextLength) > maxTextCount">
+    <div class="header" [style.minHeight.px]="instrumentsContainerHeight">
+      <div class="header-actions-container G-flex G-flex-align-center">
+        <div *ngIf="isBoldBtn" [nz-tooltip]="'textEditorBoldButtonTooltipInfo' | translate" class="button"
+             (click)="bold()"
+             (mousedown)="$event.preventDefault();">
+          <i nz-icon nzType="bold" nzTheme="outline"></i>
+        </div>
+        <div *ngIf="isItalicBtn" [nz-tooltip]="'textEditorItalicButtonTooltipInfo' | translate" class="button"
+             (click)="italic()"
+             (mousedown)="$event.preventDefault()">
+          <i nz-icon nzType="italic" nzTheme="outline"></i>
+        </div>
+        <div *ngIf="isUnderlineBtn" [nz-tooltip]="'textEditorUnderlineButtonTooltipInfo' | translate" class="button"
+             (click)="underline()"
+             (mousedown)="$event.preventDefault()">
+          <i nz-icon nzType="underline" nzTheme="outline"></i>
+        </div>
+        <div *ngIf="isStrikeThroughBtn" [nz-tooltip]="'textEditorStrikeThroughButtonTooltipInfo' | translate"
+             class="button"
+             (click)="strikeThrough()"
+             (mousedown)="$event.preventDefault()">
+          <i nz-icon nzType="strikethrough" nzTheme="outline"></i>
+        </div>
+        <div class="line"></div>
+        <div *ngIf="isLinkBtn" [nz-tooltip]="'textEditorLinkButtonTooltipInfo' | translate" class="button"
+             (click)="link()"
+             (mousedown)="$event.preventDefault()">
+          <i nz-icon nzType="link" nzTheme="outline"></i>
+        </div>
+        <div *ngIf="isBotLinkWithIdBtn" [nz-tooltip]="'textEditorBotLinkWithIdButtonTooltipInfo' | translate"
+             class="button"
+             (click)="botLinkWithId()"
+             (mousedown)="$event.preventDefault()">
+          <i nz-icon nzType="link" nzTheme="outline"></i>
+          <i nz-icon nzType="user" nzTheme="outline"></i>
+        </div>
+        <div *ngIf="isBotLinkBtn" [nz-tooltip]="'textEditorBotLinkButtonTooltipInfo' | translate" class="button"
+             (click)="botLink()"
+             (mousedown)="$event.preventDefault()">
+          <i nz-icon nzType="link" nzTheme="outline"></i>
+          <i nz-icon nzType="robot" nzTheme="outline"></i>
+        </div>
+        <div *ngIf="isDirectLink" [nz-tooltip]="'textEditorDirectLinkButtonTooltipInfo' | translate" class="button"
+             (click)="directLink()"
+             (mousedown)="$event.preventDefault()">
+          <i nz-icon nzType="link" nzTheme="outline"></i>
+          <i nz-icon nzType="send" nzTheme="outline"></i>
+        </div>
+        <div *ngIf="isExternalLinkBtn" [nz-tooltip]="'textEditorExternalLinkButtonTooltipInfo' | translate"
+             class="button"
+             (click)="externalLink()"
+             (mousedown)="$event.preventDefault()">
+          <i nz-icon nzType="link" nzTheme="outline"></i>
+          <i nz-icon nzType="partition" nzTheme="outline"></i>
+        </div>
+        <div class="line"></div>
+        <nz-badge *ngIf="isStrikeThroughBtn" [nzCount]="stickerStateIcon" class="button">
+          <div [nz-tooltip]="'textEditorStickerButtonTooltipInfo' | translate"
+               (click)="isVisibleStickersModalFlag = true"
+               (mousedown)="$event.preventDefault()">
+            <i nz-icon nzType="smile" nzTheme="outline"></i>
+          </div>
+        </nz-badge>
+        <ng-template #stickerStateIcon>
+          <i *ngIf="selectedStickerId" class="ant-scroll-number-custom-component" nz-icon nzType="check-circle"
+             nzTheme="fill" [style.color]="'#f5222d'"></i>
+        </ng-template>
+        <nz-badge *ngIf="isAttachmentsBtn" [nzCount]="uploadCareStateIcon" class="button">
+          <div [class.G-w-50px]="isAttachmentsVideo" [nz-tooltip]="'textEditorUploadButtonTooltipInfo' | translate"
+               (click)="uploadFileModal(true)" (mousedown)="$event.preventDefault()">
+            <i nz-icon nzType="file-add" nzTheme="outline">
+              <div class="attach-icon__loading">
+                <nz-spin [nzSpinning] = "attachSendLoading"></nz-spin>
+              </div>
+            </i>
+          </div>
+        </nz-badge>
+        <ng-template #uploadCareStateIcon>
+          <i *ngIf="isUploadFileDone" nz-icon nzType="check-circle" nzTheme="fill"
+             class="ant-scroll-number-custom-component" [style.color]="'#f5222d'"></i>
+        </ng-template>
+        <nz-badge *ngIf="isAddButtonBtn" [nzCount]="addButtonStateIcon" class="button">
+          <div [nz-tooltip]="'textEditorAddButtonTooltipInfo' | translate"
+               (click)="addButton()"
+               (mousedown)="$event.preventDefault()">
+            <i nz-icon nzType="appstore-add" nzTheme="outline"></i>
+          </div>
+        </nz-badge>
+        <ng-template #addButtonStateIcon>
+          <i *ngIf="isVisibleButtonsContainer" nz-icon nzType="check-circle" nzTheme="fill"
+             class="ant-scroll-number-custom-component" [style.color]="'#f5222d'"></i>
+        </ng-template>
+        <div class="line"></div>
+        <div [nz-tooltip]="'textEditorRemoveFormatButtonTooltipInfo' | translate"
+             class="button"
+             (click)="removeFormat()"
+             (mousedown)="$event.preventDefault()">
+          <i nz-icon nzType="delete" nzTheme="outline"></i>
+        </div>
+      </div>
+      <div class="header-html-section-switch G-min-w-125">
+        <nz-switch nzSize="small" [nz-tooltip]="'textEditorShowHtmlCodeSwitchTooltipInfo' | translate" [(ngModel)]="isPreviewHTML"
+                   [ngModelOptions]="{standalone: true}"></nz-switch>
+        <span class="G-ml-20px">{{previewHTML | htmlTextLength}} / {{maxTextCount}}</span>
+      </div>
+    </div>
+    <div class="G-flex G-w-100p G-overflow-y-auto G-h-100p">
+      <div #body
+           [class.max-symbol-length]="(previewHTML | htmlTextLength) > maxTextCount"
+           [class.G-w-100p]="!isPreviewHTML"
+           [class.G-w-50p]="isPreviewHTML"
+           class="body G-overflow-y-auto"
+           contenteditable="true"
+           (paste)="pastFunction($event)"
+           (input)="inputText($event)"
+           (keydown.enter)="$event.preventDefault()"
+           (keyup.enter)="$event.preventDefault();sendText($event)">
+      </div>
+      <pre *ngIf="isPreviewHTML" class="preview G-overflow-y-auto G-w-50p G-mb-0px"
+           [class.max-symbol-length]="(previewHTML | htmlTextLength) > maxTextCount">{{previewHTML}}</pre>
+    </div>
+  </div>
+</div>
+
+<nz-modal
+  [(nzVisible)]="isVisibleStickersModalFlag"
+  [nzTitle]="'stickersModalTitle' | translate"
+  nzCentered
+  (nzOnCancel)="stickersModal(false)"
+  (nzOnOk)="stickersModal(true)">
+  <div class="container G-max-h-400px">
+    <div class="G-flex-justify-center sticker-preview-container" *ngIf="selectedStickerId">
+      <img width="150" height="150"
+           [src]="(stickersList | findObjInArrayByKeyValue: 'id': selectedStickerId)?.converted_url" alt="">
+      <i (click)="selectedStickerId = null" class="sticker-remove-icon" nz-icon nzType="close-circle"
+         nzTheme="outline"></i>
+    </div>
+    <div class="G-flex G-overflow-y-auto G-mt-10px G-flex-wrap">
+      <img *ngFor="let sticker of stickersList" width="50" height="50" [src]="sticker.converted_url"
+           (click)="selectedStickerId = sticker.id" alt="">
+    </div>
+  </div>
+</nz-modal>
+
+<nz-modal [(nzVisible)]="isUploadFileModalVisible"
+          [nzTitle]="'textEditorUploadButtonTooltipInfo' | translate"
+          (nzOnCancel)="uploadFileModal(false); attachCleaningAcceptFlag = false;"
+          (nzOnOk)="uploadFileModal(false, true)">
+  <ng-container>
+      <div nz-row *ngIf="!attachVisibleFlag">
+        <nz-select nzPlaceHolder="Выберите тип файла"
+                   [(ngModel)]="uploadFileType">
+          <nz-option nzValue="Photo" nzLabel="Фото"></nz-option>
+          <nz-option nzValue="Document" nzLabel="Файл"></nz-option>
+          <nz-option nzValue="Video" nzLabel="Видео"></nz-option>
+          <nz-option nzValue="Voice" nzLabel="Голосовое"></nz-option>
+          <nz-option nzValue="VideoNote" nzLabel="Видео (в кружочке)"></nz-option>
+          <nz-option nzValue="Audio" nzLabel="Аудио файл"></nz-option>
+          <nz-option nzValue="Animation" nzLabel="GIF"></nz-option>
+        </nz-select>
+      </div>
+    <div nz-row *ngIf="attachVisibleFlag">
+      <div class="nz-uploaded-attachment">
+        <div *ngIf="this.selectedAttachments?.type === 'Video'">
+          <video controls [src]="selectedAttachments?.file_url" alt=""></video>
+        </div>
+        <div *ngIf="this.selectedAttachments?.type === 'Photo'">
+          <img [src]="selectedAttachments?.file_url" alt="">
+        </div>
+        <button class="ant-btn ant-btn-primary" (click)="cleanAttachment()" *ngIf="!attachCleaningAcceptFlag">Загрузить новое вложение</button>
+        <div *ngIf="attachCleaningAcceptFlag" class="upload-cancel-block">
+          Вы уверены?
+          <div class="upload-button-cancel">
+            <button class="ant-btn ant-btn-primary" (click)="changeAttachment(true)">Да</button>
+            <button class="ant-btn ant-btn-danger" (click)="changeAttachment(false)">Нет</button>
+          </div>
+        </div>
+      </div>
+    </div>
+      <div nz-row class="file-uplader">
+        <nz-upload
+          *ngIf="!!uploadFileType"
+          [nzDisabled]="!!fileCustomLink"
+          nzAction="upload"
+          [nzCustomRequest]="customUploadRequest"
+          (nzChange)="uploadFileChange($event)"
+        >
+          <button nz-button *ngIf="!isUploadFileDone">
+            <i nz-icon nzType="upload"></i>
+            Click to Upload
+          </button>
+        </nz-upload>
+          <div class="file-link-block" *ngIf="!!uploadFileType && !isUploadFileDone">
+          <input type="text" class="file-link-block__url ant-input" placeholder="File url" [(ngModel)]="fileCustomLink">
+        </div>
+      </div>
+  </ng-container>
+</nz-modal>

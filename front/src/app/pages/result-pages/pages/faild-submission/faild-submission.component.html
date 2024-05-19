@@ -1,0 +1,23 @@
+<div class="G-absolute-center">
+  <nz-result
+    [nzTitle]="'submissionFailed' | translate"
+    nzStatus="error"
+    [nzSubTitle]="'pleaseCheckAndModifyTheFollowingInformationBeforeResubmitting' | translate">
+    <div nz-result-content>
+      <div class="desc">
+        <h4 nz-title>{{ 'The content you submitted has the following error' | translate }}r:</h4>
+        <p nz-paragraph>
+          <i nz-icon nzType="close-circle"></i>
+          {{ 'yourAccountHasBeenFrozen' | translate }} <a>{{ 'thawImmediately' | translate }} &gt;</a>
+        </p>
+        <p nz-paragraph>
+          <i nz-icon nzType="close-circle"></i>
+          {{ 'yourAccountIsNotYetEligibleToApply' | translate }} <a>{{ 'applyImmediately' | translate }} &gt;</a>
+        </p>
+      </div>
+    </div>
+    <div nz-result-extra>
+      <button nz-button nzType="primary" routerLink="">{{ 'backHome' | translate }}</button>
+    </div>
+  </nz-result>
+</div>

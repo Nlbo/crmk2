@@ -1,0 +1,39 @@
+.events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.events .ant-badge-status {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+
+.notes-month {
+  text-align: center;
+  font-size: 28px;
+}
+
+.notes-month section {
+  font-size: 28px;
+}
+
+.P-delete-icon {
+  margin-left: 5px;
+  color: black;
+  cursor: pointer;
+  transition: 0.3s all;
+  &:hover {
+    transform: scale(1.2);
+    color: #ff4d4f;
+  }
+}
+
+::ng-deep .container {
+  .ant-picker-calendar-mode-switch  {
+    display: none;
+  }
+}

@@ -1,0 +1,210 @@
+<nz-page-header class="G-capitalize" nzTitle="{{ 'managePostPreviewTitle' | translate }}" nzBackIcon
+                *ngIf="router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'managePostPreviewTitle' | translate }}</nz-page-header-title>
+</nz-page-header>
+
+<nz-page-header class="G-capitalize"
+                nzTitle="{{ 'managePostManageTitle' | translate: {manageType: ManageType | translate} }}"
+                *ngIf="!router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'managePostManageTitle' | translate: {manageType: ManageType | translate} }}</nz-page-header-title>
+</nz-page-header>
+
+<form nz-form [nzLayout]="'vertical'" [formGroup]="postsManageModel.formGroup" (ngSubmit)="submitForm()">
+  <div class="G-flex-justify-between">
+    <div class="G-w-49p">
+      <nz-form-item class="G-column G-flex-align-start">
+        <nz-form-label>{{'title' | translate}}</nz-form-label>
+        <nz-form-control class="G-w-100p" nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+          <input nz-input [formControl]="postsManageModel.title"
+                 [placeholder]="'manageChainsContentTitlePlaceholder' | translate" required/>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label nzRequired>{{ 'language' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+          <nz-select nzShowSearch nzPlaceHolder="Select a series" formControlName="languageId">
+            <nz-option *ngFor="let language of languagesList" [nzValue]="language.id"
+                       [nzLabel]="language.title"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div class="G-flex-justify-between">
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label>{{ 'character' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="'requiredCharacter' | translate">
+          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a series" formControlName="characterId">
+            <nz-option *ngFor="let character of charactersList" [nzValue]="character.id"
+                       [nzLabel]="character.title"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label nzRequired>{{ 'category' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="'requiredCategory' | translate">
+          <nz-select nzShowSearch nzPlaceHolder="Select a series" formControlName="categoryId">
+            <nz-option *ngFor="let category of categoriesList" [nzValue]="category.id"
+                       [nzLabel]="category.title"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div class="G-flex-justify-between">
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label>{{ 'country' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback>
+          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a country" formControlName="countryId">
+            <nz-option *ngFor="let country of countriesList" [nzValue]="country.id"
+                       [nzLabel]="country.title"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label>{{ 'subject' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback>
+          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a subject" formControlName="subjectId">
+            <nz-option *ngFor="let subject of subjectsList" [nzValue]="subject.id"
+                       [nzLabel]="subject.title"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div class="G-h-200px">
+    <app-text-editor
+      [formControl]="postsManageModel.body"
+      [instrumentsContainerHeight]="60"
+      [isSendVideoNote]="isSendVideoNote"
+      (addButtonTriggerEvent)="openButtonsModal();"
+      [selectedStickerId]="postsManageModel.stickers.value"
+      [isVisibleButtonsContainer]="isVisibleButtonsContainer"
+      [isClearUploadCareState]="false"
+      [isClearStickersState]="false"
+      [selectedAttachmentId]="postsManageModel.attachmentId.value"
+      [selectedAttachments]="postsManageModel.attachments.value"
+      (selectSticker)="postsManageModel.stickers.setValue($event.id)"
+      (changeAttachmentVideoMode)="changeAttachmentVideoMode($event)"
+      (sendAttachment)="sendAttachment($event)">
+    </app-text-editor>
+  </div>
+  <div class="buttons-container" *ngIf="isVisibleButtonsContainer">
+    <div class="buttons-container" *ngIf="isVisibleButtonsContainer">
+      <app-link-types [formControl]="postsManageModel.buttons" (removeButton)="closeButtonsModal()"></app-link-types>
+    </div>
+  </div>
+  <div class="G-mt-20px channels-container">
+    <nz-table #nzTable
+              [nzScroll]="{ x: '1100px' }"
+              nzShowPagination
+              [nzData]="channelsList"
+              nzTableLayout="fixed"
+              [nzPageSize]="pageSize"
+              [nzTotal]="channelsResponse?.total"
+              [nzFrontPagination]="false"
+              (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+              (nzPageIndexChange)="pageIndex = $event;getChannelsList()"
+              [nzPageIndex]="pageIndex">
+      <thead>
+      <tr>
+        <th [nzChecked]="checked" [nzIndeterminate]="indeterminate" (nzCheckedChange)="onAllChecked($event)"></th>        <th>{{'title' | translate}}</th>
+        <th>{{'telegram_id' | translate}}</th>
+        <th>{{'language' | translate}}</th>
+        <th>{{'countries' | translate}}</th>
+        <th>{{'subjects' | translate}}</th>
+        <th>{{'characters' | translate}}</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let channel of nzTable.data">
+        <td [nzChecked]="setOfCheckedId.has(channel.id)"
+            (nzCheckedChange)="onSelectChannel(channel.id, $event)"></td>
+        <td appCursor nzEllipsis [nz-tooltip]="channel.title">{{ channel.title }}</td>
+        <td appCursor nzEllipsis [nz-tooltip]="channel.telegram_id">{{ channel.telegram_id }}</td>
+        <td appCursor nzEllipsis [nz-tooltip]="channel.language?.title">{{ channel.language?.title }}</td>
+        <td nzEllipsis [nz-tooltip]="countriesContainer" [nzTooltipColor]="'white'">
+          <ng-container *ngIf="channel.countries?.length" [ngTemplateOutlet]="countriesContainer"></ng-container>
+          <ng-template #countriesContainer>
+            <nz-tag class="G-mt-5px" *ngFor="let country of channel.countries; let i = index" [nzMode]="'default'">
+              {{ country.title }}
+            </nz-tag>
+          </ng-template>
+        </td>
+        <td nzEllipsis [nz-tooltip]="subjectsContainer" [nzTooltipColor]="'white'">
+          <ng-container *ngIf="channel.subjects?.length" [ngTemplateOutlet]="subjectsContainer"></ng-container>
+          <ng-template #subjectsContainer>
+            <nz-tag class="G-mt-5px" *ngFor="let subject of channel.subjects; let i = index" [nzMode]="'default'">
+              {{ subject.title }}
+            </nz-tag>
+          </ng-template>
+        </td>
+        <td nzEllipsis [nz-tooltip]="charactersContainer" [nzTooltipColor]="'white'">
+          <ng-container *ngIf="channel.characters?.length" [ngTemplateOutlet]="charactersContainer"></ng-container>
+          <ng-template #charactersContainer>
+            <nz-tag class="G-mt-5px" *ngFor="let character of channel.characters; let i = index" [nzMode]="'default'">
+              {{ character.title }}
+            </nz-tag>
+          </ng-template>
+        </td>
+      </tr>
+      </tbody>
+    </nz-table>
+    <div class="G-flex-justify-end G-mb-20px" *ngIf="setOfCheckedId.size">
+      <button nz-button nzType="primary" class="G-ml-10px" type="button"
+              (click)="isVisibleSendModal = true">{{'send' | translate}}</button>
+    </div>
+  </div>
+  <div class="G-flex-justify-end G-mt-20px" *ngIf="ManageType !== ManageTypesEnum.Preview">
+    <button nz-button [appNavigateBack]="['', 'posts']">{{ 'cancel' | translate }}</button>
+    <button
+      nz-button
+      [nzLoading]="(isGettingOneChainContent$ | async) || isManagingPost"
+      [disabled]="postsManageModel.formGroup.invalid || isManagingPost"
+      nzType="primary"
+      class="G-ml-5px">
+      {{ (ManageType === ManageTypesEnum.Add ? 'add' : 'edit') | translate }}
+    </button>
+  </div>
+</form>
+
+<nz-modal
+  [(nzVisible)]="isVisibleSendModal"
+  [nzTitle]="'sendModalText' | translate"
+  [nzOkText]="'send' | translate"
+  [nzCancelText]="'cancel' | translate"
+  nzCentered
+  (nzOnCancel)="isVisibleSendModal = false"
+  (nzOnOk)="send()">
+  <ng-container *nzModalContent>
+    <div class="G-w-100p G-h-100p">
+      <nz-form-item class="G-m-0px">
+        <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+          <nz-date-picker class="G-w-100p" nzShowTime [formControl]="sendFormControl" [nzInputReadOnly]="true"
+                          nzFormat="YYY-MM-dd HH:mm"></nz-date-picker>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </ng-container>
+</nz-modal>
+
+
+<nz-modal
+  nzCentered
+  [(nzVisible)]="isVisibleCreateUpdatePostModal"
+  [nzOkText]="(ManageType === ManageTypesEnum.Add ? 'add' : 'edit') | translate"
+  [nzCancelText]="'cancel' | translate"
+  [nzTitle]="'managePostManageTitle' | translate: {manageType: ManageType | translate}"
+  (nzOnCancel)="isVisibleCreateUpdatePostModal = false;this.isVisibleSendModal = false;"
+  (nzOnOk)="createUpdatePostWithoutRedirect()">
+  <p *nzModalContent>{{isEqual(originalFormValue, postsManageModel.getCreateValues()) ? ('postNotCreatedCreateProcessModalText' | translate) : 'postNotCreatedCreateProcessModalTextNotSaved' | translate}}</p>
+</nz-modal>
+

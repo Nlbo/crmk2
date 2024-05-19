@@ -1,0 +1,96 @@
+@import './normalize';
+@import './overwrite';
+@import './variables';
+@import './box-model';
+@import './mixins';
+@import './flex';
+@import './fonts';
+@import './colors';
+
+.G-text-align-end {
+  text-align: end;
+}
+
+.G-text-align-center {
+  text-align: center!important;
+}
+
+.G-relative {
+    position: relative;
+}
+
+.G-overflow-y-auto {
+  overflow-y: auto;
+}
+
+.G-overflow-x-auto {
+  overflow-x: auto;
+}
+
+.G-absolute {
+    position: absolute;
+}
+
+.G-absolute-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.G-fixed {
+    position: fixed;
+}
+
+.G-bold {
+  font-weight: bold;
+}
+
+.G-capitalize {
+  text-transform: capitalize;
+}
+
+.G-capitalize-placeholder::placeholder {
+  text-transform: capitalize;
+}
+
+.G-uppercase {
+  text-transform: uppercase;
+}
+
+.G-uppercase-placeholder::placeholder {
+  text-transform: uppercase;
+}
+
+.G-title-case {
+  text-transform: capitalize;
+}
+
+.G-disable {
+    user-select    : none;
+    pointer-events : none;
+}
+
+.G-cursor {
+    cursor: pointer;
+}
+
+.G-default-cursor {
+    cursor: default;
+}
+
+.G-grab-cursor {
+    cursor: grab;
+}
+
+.G-grabbing-cursor {
+    cursor: grabbing;
+}
+
+.G-not-allowed {
+  cursor: not-allowed;
+}
+
+.G-border-none {
+  border: none;
+}

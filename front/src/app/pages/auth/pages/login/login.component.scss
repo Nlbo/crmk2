@@ -1,0 +1,65 @@
+@import 'variables';
+
+.P-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  background-color: #259BD7;
+  background-image: url('/assets/images/login-page-bg.svg');
+
+  .P-card {
+    margin-top: 160px;
+    width: 320px;
+    height: fit-content;
+    padding-bottom: $app-padding;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: #fff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+
+
+    .P-logo-section {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      img {
+        width: 120px;
+      }
+
+      .P-logo-text {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+
+        span {
+          font-size: 13px;
+        }
+      }
+    }
+
+    .P-form-section {
+      margin-top: $app-margin;
+      width: 90%;
+
+      .login-form {
+        max-width: 300px;
+      }
+
+      .login-form-margin {
+        margin-bottom: 16px;
+      }
+
+      .login-form-forgot {
+        float: right;
+      }
+
+      .login-form-button {
+        width: 100%;
+      }
+    }
+  }
+}

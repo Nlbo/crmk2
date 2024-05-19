@@ -1,0 +1,32 @@
+<div class="G-flex-center-between G-mb-20px">
+  <h2>
+    {{'permissions' | translate}} {{ 'total' | translate }}: {{ permissionsResponse?.total }}
+  </h2>
+</div>
+<nz-table #nzTable
+          [nzScroll]="{ x: '1100px' }"
+          nzShowPagination
+          [nzData]="permissionsList"
+          nzTableLayout="fixed"
+          [nzPageSize]="pageSize"
+          [nzTotal]="permissionsResponse?.total"
+          [nzFrontPagination]="false"
+          (nzPageIndexChange)="pageIndex = $event;initializeValues()"
+          [nzPageIndex]="pageIndex">
+  <thead>
+  <tr>
+    <th>{{'title' | translate}}</th>
+    <th>{{'description' | translate}}</th>
+    <th>{{'created_at' | translate}}</th>
+    <th>{{'updated_at' | translate}}</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let permission of nzTable.data">
+    <td nzEllipsis [nz-tooltip]="permission.title">{{ permission.title }}</td>
+    <td nzEllipsis [nz-tooltip]="permission.description">{{ permission.description }}</td>
+    <td>{{ permission.created_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+    <td>{{ permission.updated_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+  </tr>
+  </tbody>
+</nz-table>

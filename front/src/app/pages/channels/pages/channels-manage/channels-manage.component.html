@@ -1,0 +1,145 @@
+<nz-page-header class="G-capitalize" nzTitle="{{ 'manageCategoriesPreviewTitle' | translate }}" nzBackIcon
+                *ngIf="router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageCategoriesPreviewTitle' | translate }}</nz-page-header-title>
+</nz-page-header>
+
+<nz-page-header class="G-capitalize"
+                nzTitle="{{ 'manageCategoriesManageTitle' | translate: {manageType: ManageType | translate} }}"
+                *ngIf="!router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageCategoriesManageTitle' | translate: {manageType: ManageType | translate} }}</nz-page-header-title>
+</nz-page-header>
+
+<form nz-form [formGroup]="manageChannelModel.formGroup" [nzLayout]="'vertical'" (ngSubmit)="submitForm()">
+  <div class="G-flex-justify-between">
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label>{{'title' | translate}}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+          <input nz-input formControlName="title" [placeholder]="'manageChannelsTitleInputPlaceholder' | translate"
+                 required/>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label nzRequired>{{ 'language' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+          <nz-select nzShowSearch nzPlaceHolder="Select a series" formControlName="languageId">
+            <nz-option *ngFor="let language of languagesList" [nzValue]="language.id" [nzLabel]="language.title"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div class="G-flex-justify-between">
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label>{{'characters' | translate}}</nz-form-label>
+        <nz-form-control nzHasFeedback>
+          <nz-select nzShowSearch nzMode="multiple" [nzPlaceHolder]="'manageChannelCharactersSelectPlaceholder' | translate" formControlName="characters">
+            <nz-option *ngFor="let character of charactersList" [nzLabel]="character.title" [nzValue]="character.id"
+                       [nzHide]="!isNotSelectedCharacters(character.id)"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label nzRequired>{{'telegramChannelId' | translate}}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTelegramChannelId' | translate">
+          <input nz-input formControlName="telegramId" [placeholder]="'manageChannelTelegramChannelIdInputPlaceholder' | translate"
+                 required/>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div class="G-flex-justify-between">
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label nzRequired>{{ 'manageChannelChannelPoster' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="'manageChannelRequiredChannelPoster' | translate">
+          <nz-select nzShowSearch [nzPlaceHolder]="'manageChannelChannelPosterSelectPlaceholder' | translate" formControlName="posters">
+            <nz-option *ngFor="let bot of botsList" [nzValue]="bot.id"
+                       [nzLabel]="bot.title"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label nzRequired>{{ 'manageChannelChannelManager' | translate }}</nz-form-label>
+        <nz-form-control nzHasFeedback [nzErrorTip]="'manageChannelRequiredChannelManager' | translate">
+          <nz-select nzShowSearch [nzPlaceHolder]="'manageChannelChannelManagerSelectPlaceholder' | translate" formControlName="managers">
+            <nz-option *ngFor="let bot of botsList" [nzValue]="bot.id" [nzLabel]="bot.title"></nz-option></nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div class="G-flex-justify-between">
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label>{{'countries' | translate}}</nz-form-label>
+        <nz-form-control nzHasFeedback>
+          <nz-select nzShowSearch nzMode="multiple" [nzPlaceHolder]="'manageChannelCountriesSelectPlaceholder' | translate" formControlName="countries">
+            <nz-option *ngFor="let country of countriesList" [nzLabel]="country.title" [nzValue]="country.id"
+                       [nzHide]="!isNotSelectedCountries(country.id)"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label>{{'subjects' | translate}}</nz-form-label>
+        <nz-form-control nzHasFeedback>
+          <nz-select nzShowSearch nzMode="multiple" [nzPlaceHolder]="'manageChannelSubjectsSelectPlaceholder' | translate" formControlName="subjects">
+            <nz-option *ngFor="let subject of subjectsList" [nzLabel]="subject.title" [nzValue]="subject.id"
+                       [nzHide]="!isNotSelectedSubjects(subject.id)"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+
+  <div class="G-flex-justify-between">
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label>{{'categoriesForInstantSending' | translate}}</nz-form-label>
+        <nz-form-control nzHasFeedback>
+          <nz-select nzShowSearch nzMode="multiple" [nzPlaceHolder]="'manageChannelCategoriesSelectPlaceholder' | translate" formControlName="categories">
+            <nz-option *ngFor="let category of categoriesList" [nzLabel]="category.title" [nzValue]="category.id"
+                       [nzHide]="!isNotSelectedCategories(category.id)"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label>{{'manageChannelExternalLink' | translate}}</nz-form-label>
+        <nz-form-control nzHasFeedback>
+          <input nz-input formControlName="externalLink" [placeholder]="'manageChannelExternalLinkInputPlaceholder' | translate"/>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div class="G-flex-justify-between">
+    <div class="G-w-49p">
+      <nz-form-item>
+        <nz-form-label>{{'manageChannelDirectLink' | translate}}</nz-form-label>
+        <nz-form-control nzHasFeedback>
+          <input nz-input formControlName="directLink" [placeholder]="'manageChannelDirectLinkInputPlaceholder' | translate"/>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <div class="G-flex-justify-end" *ngIf="ManageType !== ManageTypesEnum.Preview ">
+    <button nz-button [appNavigateBack]="['', 'dictionaries', 'categories']">{{ 'cancel' | translate }}</button>
+    <button
+      nz-button
+      [nzLoading]="(isGettingOneChannel$ | async) || isManagingChannel"
+      [disabled]="manageChannelModel.formGroup.invalid || isManagingChannel"
+      nzType="primary"
+      class="G-ml-5px">
+      {{ (ManageType === ManageTypesEnum.Add ? 'add' : 'edit') | translate }}
+    </button>
+  </div>
+</form>

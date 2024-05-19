@@ -1,0 +1,179 @@
+
+<nz-page-header class="G-capitalize" nzTitle="{{ 'channelsCalendarTitle' | translate }}" nzBackIcon (nzBack)="back()"></nz-page-header>
+
+<nz-calendar class="container" (nzSelectChange)="selectDay($event)" [(ngModel)]="currentDate">
+  <ul *nzDateCell="let date" class="events">
+    <ng-container [ngSwitch]="date.getDate()">
+      <ng-container *ngFor="let schedule of schedulesList">
+        <ng-container *ngIf="(+date.getMonth() + 1) == (schedule.time | date: 'M' : '+0300')">
+          <ng-container *ngSwitchCase="schedule.time | date:'dd' : '+0300'">
+            <li [ngSwitch]="schedule.status_code">
+              <ng-container *ngSwitchCase="SchedulesTypesEnum.Null">
+                  <nz-badge
+                    nz-tooltip
+                    [nzStatus]="NzBadgeStatusTypesEnum.Processing"
+                    [nzTooltipTitle]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostProcessingStatusText' | translate)"
+                    [nzText]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostProcessingStatusText' | translate)">
+                  </nz-badge>
+              </ng-container>
+              <ng-container *ngSwitchCase="SchedulesTypesEnum.Error">
+                <nz-badge
+                  nz-tooltip
+                  [nzStatus]="NzBadgeStatusTypesEnum.Error"
+                  [nzTooltipTitle]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostErrorStatusText' | translate)"
+                  [nzText]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostErrorStatusText' | translate)">
+                </nz-badge>
+              </ng-container>
+              <ng-container *ngSwitchCase="SchedulesTypesEnum.NoPost">
+                <nz-badge
+                  nz-tooltip
+                  [nzStatus]="NzBadgeStatusTypesEnum.Warning"
+                  [nzTooltipTitle]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostNoPostedStatusText' | translate)"
+                  [nzText]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostNoPostedStatusText' | translate)">
+                </nz-badge>
+              </ng-container>
+              <ng-container *ngSwitchCase="SchedulesTypesEnum.TelegramError">
+                <nz-badge
+                  nz-tooltip
+                  [nzStatus]="NzBadgeStatusTypesEnum.Error"
+                  [nzTooltipTitle]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostTelegramErrorStatusText' | translate)"
+                  [nzText]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostTelegramErrorStatusText' | translate)">
+                </nz-badge>
+              </ng-container>
+              <ng-container *ngSwitchCase="SchedulesTypesEnum.Success">
+                <nz-badge
+                  nz-tooltip
+                  [nzStatus]="NzBadgeStatusTypesEnum.Success"
+                  [nzTooltipTitle]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostSuccessfullyPostedStatusText' | translate)"
+                  [nzText]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostSuccessfullyPostedStatusText' | translate)">
+                </nz-badge>
+              </ng-container>
+            </li>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </ul>
+  <ng-container *nzMonthCell="let month">
+    <div *ngIf="getMonthData(month) as monthData" class="notes-month">
+      <section>{{ monthData }}</section>
+      <span>Backlog number</span>
+    </div>
+  </ng-container>
+</nz-calendar>
+
+
+<nz-modal
+  [(nzVisible)]="isVisibleSelectedDayModal"
+  [nzTitle]="'calendarSelectDayModalTitle' | translate: {day: selectedDay | date: 'dd-MM-yyy' : '+0300'}"
+  nzCentered
+  [nzOkDisabled]="isCreatingSchedule"
+  [nzOkLoading]="isCreatingSchedule"
+  (nzOnCancel)="manageSelectedDayModal(false)"
+  (nzOnOk)="manageSelectedDayModal(false)">
+  <nz-tabset (nzSelectChange)="changeTab($event.index)" [(nzSelectedIndex)]="selectedDayModalTabIndex">
+    <nz-tab [nzTitle]="'schedulesList' | translate">
+      <div class="G-max-h-173px G-overflow-y-auto G-p-5px">
+        <ng-container [ngSwitch]="selectedDay?.getDate()">
+          <ng-container *ngFor="let schedule of schedulesList">
+            <ng-container *ngIf="(+selectedDay?.getMonth() + 1) == (schedule.time | date: 'M' : '+0300')">
+              <ng-container *ngSwitchCase="schedule.time | date:'dd' : '+0300'">
+                <li [ngSwitch]="schedule.status_code">
+                  <ng-container *ngSwitchCase="SchedulesTypesEnum.Null">
+                    <div class="G-w-100p G-flex-justify-between">
+                      <nz-badge
+                        [nzStatus]="NzBadgeStatusTypesEnum.Processing"
+                        [nzText]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostProcessingStatusText' | translate)">
+                      </nz-badge>
+                      <i
+                        [appPermission]="[PermissionsEnum.DeleteSchedule]"
+                        class="P-delete-icon"
+                        nz-icon nzType="delete"
+                        nzTheme="outline"
+                        [nzPopconfirmTitle]="'deleteChannelPostPopupText' | translate"
+                        nz-popconfirm
+                        (nzOnConfirm)="deleteScheduler(schedule.id)">
+                      </i>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="SchedulesTypesEnum.Error">
+                    <div class="G-w-100p G-flex-justify-between">
+                      <nz-badge
+                        [nzStatus]="NzBadgeStatusTypesEnum.Error"
+                        [nzText]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostErrorStatusText' | translate)">
+                      </nz-badge>
+                      <i
+                        [appPermission]="[PermissionsEnum.DeleteSchedule]"
+                        class="P-delete-icon"
+                        nz-icon nzType="delete"
+                        nzTheme="outline"
+                        [nzPopconfirmTitle]="'deleteChannelPostPopupText' | translate"
+                        nz-popconfirm
+                        (nzOnConfirm)="deleteScheduler(schedule.id)">
+                      </i>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="SchedulesTypesEnum.NoPost">
+                    <div class="G-w-100p G-flex-justify-between">
+                      <nz-badge
+                        [nzStatus]="NzBadgeStatusTypesEnum.Warning"
+                        [nzText]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostNoPostedStatusText' | translate)">
+                      </nz-badge>
+                      <i
+                        [appPermission]="[PermissionsEnum.DeleteSchedule]"
+                        class="P-delete-icon"
+                        nz-icon nzType="delete"
+                        nzTheme="outline"
+                        [nzPopconfirmTitle]="'deleteChannelPostPopupText' | translate"
+                        nz-popconfirm
+                        (nzOnConfirm)="deleteScheduler(schedule.id)">
+                      </i>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="SchedulesTypesEnum.TelegramError">
+                    <div class="G-w-100p G-flex-justify-between">
+                      <nz-badge
+                        [nzStatus]="NzBadgeStatusTypesEnum.Error"
+                        [nzText]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostTelegramErrorStatusText' | translate)">
+                      </nz-badge>
+                      <i
+                        [appPermission]="[PermissionsEnum.DeleteSchedule]"
+                        class="P-delete-icon"
+                        nz-icon nzType="delete"
+                        nzTheme="outline"
+                        [nzPopconfirmTitle]="'deleteChannelPostPopupText' | translate"
+                        nz-popconfirm
+                        (nzOnConfirm)="deleteScheduler(schedule.id)">
+                      </i>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="SchedulesTypesEnum.Success">
+                    <nz-badge
+                      [nzStatus]="NzBadgeStatusTypesEnum.Success"
+                      [nzText]="(schedule.time | date: 'HH:mm' : '+0300') + ' ' + schedule.category.title + ' - ' + ('calendarPostSuccessfullyPostedStatusText' | translate)">
+                    </nz-badge>
+                  </ng-container>
+                </li>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </div>
+    </nz-tab>
+    <nz-tab [nzTitle]="'createSchedule' | translate" [appPermission]="[PermissionsEnum.CreateSchedule]">
+      <app-channels-calendar-schedules-manage
+        [formControl]="createScheduleFormControl"
+        [date]="selectedDay">
+      </app-channels-calendar-schedules-manage>
+    </nz-tab>
+  </nz-tabset>
+  <div *nzModalFooter>
+    <ng-container *ngIf="selectedDayModalTabIndex">
+      <button nz-button nzType="default" (click)="manageSelectedDayModal(false)">{{'cancel' | translate}}</button>
+      <button nz-button nzType="primary" (click)="manageSelectedDayModal(true)">{{'create' | translate}}</button>
+    </ng-container>
+    <ng-container *ngIf="!selectedDayModalTabIndex">
+      <button nz-button nzType="default" (click)="manageSelectedDayModal(false)">{{'cancel' | translate}}</button>
+    </ng-container>
+  </div>
+</nz-modal>

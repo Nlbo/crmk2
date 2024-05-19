@@ -1,0 +1,84 @@
+<nz-page-header class="G-capitalize" nzTitle="{{ 'manageChainsContentPreviewTitle' | translate }}" nzBackIcon
+                *ngIf="router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageChainsContentPreviewTitle' | translate }}</nz-page-header-title>
+</nz-page-header>
+
+<nz-page-header class="G-capitalize"
+                nzTitle="{{ 'manageChainsContentManageTitle' | translate: {manageType: ManageType | translate} }}"
+                *ngIf="!router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageChainsContentManageTitle' | translate: {manageType: ManageType | translate} }}</nz-page-header-title>
+</nz-page-header>
+<form nz-form [formGroup]="chainsManageModel.formGroup" [nzLayout]="'vertical'" (ngSubmit)="submitForm()">
+  <div class="G-flex-justify-between">
+    <nz-form-item class="G-w-49p">
+      <nz-form-label>{{'title' | translate}}</nz-form-label>
+      <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+        <input nz-input formControlName="title" [placeholder]="'manageChainsContentTitleInputPlaceholder' | translate"
+               required/>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item class="G-w-49p">
+      <nz-form-label>{{'isActive' | translate}}</nz-form-label>
+      <nz-form-control nzHasFeedback class="G-flex G-flex-justify-between">
+        <nz-switch formControlName="isActive"></nz-switch>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+
+  <div class="G-flex-justify-between">
+    <nz-form-item class="G-w-49p">
+      <nz-form-label>{{'messageSendingInterval' | translate}}</nz-form-label>
+      <nz-form-control>
+        <nz-input-group [nzAddOnAfter]="addOnBeAfterTemplate">
+          <ng-template #addOnBeAfterTemplate>
+            <nz-select formControlName="intervalType" class="time-interval-select">
+              <nz-option *ngFor="let item of selectTimeInterval" [nzLabel]="item.label | translate"
+                         [nzValue]="item.value"></nz-option>
+            </nz-select>
+          </ng-template>
+          <input [placeholder]="'manageChainsContentMessageSendingIntervalInputPlaceholder' | translate"
+                 formControlName="interval" nz-input type="number"/>
+        </nz-input-group>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item class="G-w-49p">
+      <nz-form-label>{{'timeRange' | translate}}</nz-form-label>
+      <nz-form-control nzHasFeedback class="G-flex G-flex-justify-between">
+        <nz-switch [(ngModel)]="isCustomTime" [ngModelOptions]="{standalone: true}"
+                   (ngModelChange)="setCustomTimes($event)"></nz-switch>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+  <div class="G-flex-justify-between" *ngIf="isCustomTime">
+    <nz-form-item class="G-w-49p">
+      <nz-form-label>{{'timeFrom' | translate}}</nz-form-label>
+      <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+        <nz-time-picker class="G-w-100p"
+                        [nzMinuteStep]="15"
+                        formControlName="timeFrom" [nzDefaultOpenValue]="defaultOpenValue"
+                        nzFormat="HH:mm"></nz-time-picker>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item class="G-w-49p">
+      <nz-form-label>{{'timeTo' | translate}}</nz-form-label>
+      <nz-form-control nzHasFeedback>
+        <nz-time-picker [nzMinuteStep]="15" [nzDisabledHours]="disabledHours.bind(this)"
+                        [nzDisabledMinutes]="disabledMinutes.bind(this)" class="G-w-100p"
+                        formControlName="timeTo" [nzDefaultOpenValue]="defaultOpenValue"
+                        nzFormat="HH:mm"></nz-time-picker>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+  <div class="G-flex-justify-end" *ngIf="ManageType !== ManageTypesEnum.Preview ">
+    <button nz-button
+            [appNavigateBack]="['', 'bots', chainsManageModel.telegramBotId.value, 'chains']">{{ 'cancel' | translate }}</button>
+    <button
+      nz-button
+      [nzLoading]="(isGettingOneChain$ | async) || isManagingChain"
+      [disabled]="chainsManageModel.formGroup.invalid || isManagingChain"
+      nzType="primary"
+      class="G-ml-5px">
+      {{ (ManageType === ManageTypesEnum.Add ? 'add' : 'edit') | translate }}
+    </button>
+  </div>
+</form>

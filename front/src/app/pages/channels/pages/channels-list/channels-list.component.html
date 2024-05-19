@@ -1,0 +1,105 @@
+<div class="G-flex-center-between G-mb-20px">
+  <h2>
+    {{'channels' | translate}} {{ 'total' | translate }}: {{ channelsResponse?.total }}
+  </h2>
+  <a
+    [appPermission]="[PermissionsEnum.CreateChannel]"
+    [routerLink]="['', 'channels', ManageTypesEnum.Add]"
+    nz-button
+    nzType="primary">
+    <i nz-icon nzType="plus-circle" nzTheme="outline"></i>
+    {{ 'add' | translate }}
+  </a>
+</div>
+<nz-table #nzTable
+          [nzScroll]="{ x: '1100px' }"
+          nzShowPagination
+          [nzData]="channelsList"
+          nzTableLayout="fixed"
+          [nzPageSize]="pageSize"
+          [nzTotal]="channelsResponse?.total"
+          [nzFrontPagination]="false"
+          (nzPageIndexChange)="pageIndex = $event;initializeValues()"
+          [nzPageIndex]="pageIndex">
+  <thead>
+  <tr>
+    <th nzCustomFilter>
+      <nz-filter-trigger
+        [(nzVisible)]="visibleTitleFilter"
+        [nzActive]="channelsService.titleFilter.length > 0"
+        [nzDropdownMenu]="titleFilter">
+        <i nz-icon nzType="search"></i>
+      </nz-filter-trigger>
+      {{'title' | translate}}
+    </th>
+    <th>{{'telegram_id' | translate}}</th>
+    <th>{{'language' | translate}}</th>
+    <th>{{'created_at' | translate}}</th>
+    <th>{{'updated_at' | translate}}</th>
+    <th nzWidth="250px" class="G-text-align-center">{{'actions' | translate}}</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let channel of nzTable.data">
+    <td appCursor nzEllipsis [nz-tooltip]="channel.title">{{ channel.title }}</td>
+    <td appCursor nzEllipsis [nz-tooltip]="channel.telegram_id">{{ channel.telegram_id }}</td>
+    <td appCursor nzEllipsis [nz-tooltip]="channel.language?.title">{{ channel.language?.title }}</td>
+    <td appCursor>{{ channel.created_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300'}}</td>
+    <td appCursor>{{ channel.updated_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300'}}</td>
+    <td>
+      <div class="P-actions G-flex-justify-center">
+        <button
+          [appPermission]="[PermissionsEnum.ViewSchedule]"
+          nz-button
+          nzType="primary"
+          [routerLink]="['', 'channels', channel.id, 'calendar']">
+          <i nz-icon nzType="calendar" nzTheme="outline"></i>
+        </button>
+        <button
+          [appPermission]="[PermissionsEnum.ViewChannel, PermissionsEnum.UpdateChannel]"
+          nz-button
+          nzType="default"
+          [routerLink]="['', 'channels', ManageTypesEnum.Edit, channel.id]">
+          <i nz-icon nzType="edit" nzTheme="outline"></i>
+        </button>
+        <button
+          [appPermission]="[PermissionsEnum.DeleteChannel]"
+          nzPopconfirmPlacement="right"
+          [nzPopconfirmTitle]="'deleteChannelPopupText' | translate"
+          nz-popconfirm
+          nz-button
+          nzType="default"
+          nzDanger
+          (nzOnConfirm)="deleteChannel(channel.id)">
+          <i nz-icon nzType="delete" nzTheme="outline"></i>
+        </button>
+      </div>
+    </td>
+
+  </tr>
+  </tbody>
+</nz-table>
+
+<nz-dropdown-menu #titleFilter="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown">
+    <div class="search-box">
+      <input
+        type="text"
+        nz-input
+        [placeholder]="'searchTitle' | translate"
+        [(ngModel)]="channelsService.titleFilter"
+        (keydown.enter)="pageIndex = 0;initializeValues()">
+      <button nz-button nzSize="small"
+              nzType="primary"
+              (click)="pageIndex = 0;
+               initializeValues()"
+              class="search-button">
+        {{ 'search' | translate }}
+      </button>
+      <button
+        nz-button
+        nzSize="small"
+        (click)="channelsService.titleFilter = '';initializeValues()">{{ 'reset' | translate }}</button>
+    </div>
+  </div>
+</nz-dropdown-menu>

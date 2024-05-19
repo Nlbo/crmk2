@@ -1,0 +1,31 @@
+$list-width: 350px;
+
+.container {
+  display: flex;
+  height: calc(100vh - 205px);
+  border: 1px solid #ddd;
+  position: relative;
+
+  .chat-list {
+    width: $list-width;
+    border-right: 1px solid #ddd;
+  }
+
+  .messenger {
+    max-width: calc(100% - #{$list-width});
+    width: 100%;
+    height: 100%;
+    position: relative;
+    .messenger-container {
+      height: 100%;
+      width: 100%;
+
+    }
+    .no-sms-result {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+}

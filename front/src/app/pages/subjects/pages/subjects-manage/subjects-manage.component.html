@@ -1,0 +1,27 @@
+<nz-page-header class="G-capitalize" nzTitle="{{ 'manageSubjectsPreviewTitle' | translate }}" nzBackIcon *ngIf="router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageSubjectsPreviewTitle' | translate }}</nz-page-header-title>
+</nz-page-header>
+
+<nz-page-header class="G-capitalize" nzTitle="{{ 'manageSubjectsManageTitle' | translate: {manageType: ManageType | translate} }}" *ngIf="!router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageSubjectsManageTitle' | translate: {manageType: ManageType | translate} }}</nz-page-header-title>
+</nz-page-header>
+
+<form nz-form [formGroup]="manageSubjectsModel.formGroup" [nzLayout]="'vertical'" (ngSubmit)="submitForm()">
+  <nz-form-item>
+    <nz-form-label>{{'title' | translate}}</nz-form-label>
+    <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+      <input nz-input formControlName="title" [placeholder]="'manageSubjectTitleInputPlaceholder' | translate" required />
+    </nz-form-control>
+  </nz-form-item>
+  <div class="G-flex-justify-end" *ngIf="ManageType !== ManageTypesEnum.Preview ">
+    <button nz-button [appNavigateBack]="['', 'dictionaries', 'subjects']">{{ 'cancel' | translate }}</button>
+    <button
+      nz-button
+      [nzLoading]="(isGettingOneSubject$ | async) || isManagingSubject"
+      [disabled]="manageSubjectsModel.formGroup.invalid || isManagingSubject"
+      nzType="primary"
+      class="G-ml-5px">
+      {{ (ManageType === ManageTypesEnum.Add ? 'add' : 'edit') | translate }}
+    </button>
+  </div>
+</form>

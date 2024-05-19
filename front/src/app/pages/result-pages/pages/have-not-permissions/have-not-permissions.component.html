@@ -1,0 +1,9 @@
+<div class="G-absolute-center">
+  <nz-result nzStatus="403" nzTitle="403" [nzSubTitle]="'sorryYouHaveNotAnyPermissions' | translate">
+    <div nz-result-extra>
+      <a class="G-capitalize" nz-button nzType="default" [routerLink]="['']">{{ 'backHome' | translate }}</a>
+      <a class="G-capitalize" nz-button nzType="primary" (click)="logout()">{{ 'backToLoginPage' | translate }}</a>
+    </div>
+  </nz-result>
+</div>
+

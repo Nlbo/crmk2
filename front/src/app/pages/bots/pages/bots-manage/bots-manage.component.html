@@ -1,0 +1,49 @@
+<nz-page-header class="G-capitalize" nzTitle="{{ 'manageBotsPreviewTitle' | translate }}" nzBackIcon
+                *ngIf="router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageBotsPreviewTitle' | translate }}</nz-page-header-title>
+</nz-page-header>
+
+<nz-page-header class="G-capitalize"
+                nzTitle="{{ 'manageBotsManageTitle' | translate: {manageType: ManageType | translate} }}"
+                *ngIf="!router.url.includes(ManageTypesEnum.Preview)">
+  <nz-page-header-title>{{ 'manageBotsManageTitle' | translate: {manageType: ManageType | translate} }}</nz-page-header-title>
+</nz-page-header>
+
+<form nz-form [formGroup]="manageBotsModel.formGroup" [nzLayout]="'vertical'" (ngSubmit)="submitForm()">
+  <nz-form-item>
+    <nz-form-label>{{'title' | translate}}</nz-form-label>
+    <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+      <input nz-input formControlName="title" [placeholder]="'manageBotsTitleInputPlaceholder' | translate" required/>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label>{{'token' | translate}}</nz-form-label>
+    <nz-form-control nzHasFeedback [nzErrorTip]="'requiredToken' | translate">
+      <nz-input-group [nzSuffix]="suffixTemplate">
+        <input nz-input [type]="passwordVisible ? 'text' : 'password'" formControlName="token"
+               [placeholder]="'manageBotsTokenInputPlaceholder' | translate" required/>
+      </nz-input-group>
+    </nz-form-control>
+    <ng-template #suffixTemplate>
+      <i nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+         (click)="passwordVisible = !passwordVisible"></i>
+    </ng-template>
+  </nz-form-item>
+   <nz-form-item class="G-column G-flex-align-start">
+     <nz-form-label>{{'webhook' | translate}}</nz-form-label>
+     <nz-form-control class="G-w-100p" nzHasFeedback>
+       <nz-switch formControlName="setWebhook"></nz-switch>
+     </nz-form-control>
+   </nz-form-item>
+  <div class="G-flex-justify-end" *ngIf="ManageType !== ManageTypesEnum.Preview ">
+    <button nz-button [appNavigateBack]="['', 'bots']">{{ 'cancel' | translate }}</button>
+    <button
+      nz-button
+      [nzLoading]="(isGettingOneBot$ | async) || isManagingBot"
+      [disabled]="manageBotsModel.formGroup.invalid || isManagingBot"
+      nzType="primary"
+      class="G-ml-5px">
+      {{ (ManageType === ManageTypesEnum.Add ? 'add' : 'edit') | translate }}
+    </button>
+  </div>
+</form>

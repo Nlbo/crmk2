@@ -1,0 +1,67 @@
+<div class="messenger-container ">
+  <div class="chat-box" #chatBox (scroll)="scrollEvent($event)" (mousewheel)="isUserScroll = true">
+    <div class="loader" *ngIf="isLoadingOldMessages">
+      <i nz-icon [nzType]="'loading'"></i>
+    </div>
+    <ng-container *ngFor="let chat of chatsList">
+      <ng-container *ngIf="chat.from_id !== chatId">
+        <div class="bot-message" > <!-- (contextmenu)="contextMenu($event, menu, chat)" -->
+          <app-avatar-generator class="G-mr-10px"
+            [color]="getLocalStorageItem(chat.to_id)"
+            [fontSize]="10"
+            [firstName]="chat.message_to.first_name"
+            [lastName]="chat.message_to.last_name"
+            [avatar]="chat.message_to.avatar?.file_url"
+            [width]="30"
+            [height]="30">
+          </app-avatar-generator>
+          <div class="text G-ml-7px">
+            <app-messege-card [botId]="chatId" [chat]="chat"></app-messege-card>
+          </div>
+          <div class="square"></div>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="chat.from_id === chatId">
+        <div class="my-message" > <!--  (contextmenu)="contextMenu($event, menu, chat)" -->
+          <div class="text G-mr-7px">
+            <app-messege-card [botId]="chatId" [chat]="chat"></app-messege-card>
+          </div>
+          <div class="square"></div>
+          <app-avatar-generator [color]="getLocalStorageItem(chat.to_id )" class="G-ml-5px" [fontSize]="10" [firstName]="chat.message_to.title" [lastName]="chat.message_to.last_name" [avatar]="chat.message_to.avatar?.file_url" [width]="30" [height]="30"></app-avatar-generator>
+        </div>
+      </ng-container>
+    </ng-container>
+    <ng-container *ngIf="isSendingMessage">
+      <div class="my-message">
+        <div class="text G-mr-7px">
+          <i nz-icon [nzType]="'loading'"></i>
+        </div>
+        <div class="square" [style.right.px]="2" ></div>
+      </div>
+    </ng-container>
+  </div>
+  <div class="chat-instruments">
+    <app-text-editor
+      [formControl]="candidateChatFormControl"
+      [instrumentsContainerHeight]="60"
+      (enterSend)="sendSms($event)"
+      (selectSticker)="sendSticker($event)"
+      (sendAttachment)="sendAttachment($event)"
+      (startUploadingFile)="isSendingMessage = true;scrollToDownChats()"
+      [isClearStickersState]="true"
+      [isClearUploadCareState]="true"
+      [isEnterSend]="true"
+      [isBotLinkBtn]="false"
+      [isDirectLink]="false"
+      [isExternalLinkBtn]="false"
+      [isAddButtonBtn]="false"
+      [isBotLinkWithIdBtn]="false">
+    </app-text-editor>
+  </div>
+</div>
+
+<nz-dropdown-menu #menu="nzDropdownMenu">
+  <ul nz-menu>
+    <li nz-menu-item (click)="editChat()">{{'edit' | translate}}</li>
+  </ul>
+</nz-dropdown-menu>

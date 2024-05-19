@@ -1,0 +1,52 @@
+<div class="G-flex-center-between G-mb-20px">
+  <h2>
+    <i appCursor class="G-pr-5px" nz-icon nzType="arrow-left" nzTheme="outline" (click)="back()"></i>
+    {{'chainsContent' | translate}}  {{ 'total' | translate }}: {{ contentsResponse?.total }}
+  </h2>
+  <a
+    [routerLink]="['', 'bots', telegramBotId, 'chains', chainId, 'content', ManageTypesEnum.Add]"
+    nz-button
+    nzType="primary">
+    <i nz-icon nzType="plus-circle" nzTheme="outline"></i>
+    {{ 'add' | translate }}
+  </a>
+</div>
+<nz-table [nzScroll]="{ x: '1100px' }" nzTemplateMode [nzFrontPagination]="false" [nzShowPagination]="false">
+  <thead>
+  <tr>
+    <th>{{'order' | translate}}</th>
+    <th>{{'title' | translate}}</th>
+    <th>{{'created_at' | translate}}</th>
+    <th>{{'updated_at' | translate}}</th>
+    <th nzWidth="200px" class="G-text-align-center">{{'actions' | translate}}</th>
+  </tr>
+  </thead>
+  <tbody cdkDropList class="example-list" (cdkDropListDropped)="drop($event)">
+    <tr class="example-box" *ngFor="let content of contentsList" cdkDrag>
+      <td appCursor="grab">{{content.order}}</td>
+      <td appCursor="grab" nzEllipsis [nz-tooltip]="content.title">{{ content.title }}</td>
+      <td appCursor="grab">{{ content.created_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+      <td appCursor="grab">{{ content.updated_at | date: 'dd:MM:yyy - HH:mm:ss' : '+0300' }}</td>
+      <td>
+        <div class="P-actions G-flex-justify-center">
+          <button
+            nz-button
+            nzType="default"
+            [routerLink]="['', 'bots', telegramBotId, 'chains', chainId, 'content', ManageTypesEnum.Edit, content.id]">
+            <i nz-icon nzType="edit" nzTheme="outline"></i>
+          </button>
+          <button
+            nzPopconfirmPlacement="right"
+            [nzPopconfirmTitle]="'deleteChainsContentPopupText' | translate"
+            nz-popconfirm
+            nz-button
+            nzType="default"
+            nzDanger
+            (nzOnConfirm)="deleteBot(content.id)">
+            <i nz-icon nzType="delete" nzTheme="outline"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>

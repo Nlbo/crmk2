@@ -1,0 +1,24 @@
+@import 'variables';
+
+@mixin box($width, $height) {
+    width: $width;
+    height: $height;
+}
+
+@mixin notebook {
+    @media (max-width: #{$notebook-size}) {
+      @content;
+    }
+}
+
+@mixin netbook {
+    @media (max-width: #{$netbook-size}) {
+      @content;
+    }
+}
+
+@mixin tablet {
+    @media (max-width: #{$tablet-size}) {
+      @content;
+    }
+}

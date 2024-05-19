@@ -1,0 +1,147 @@
+stages:
+- build
+- notify
+
+variables:
+  STAGE_BRANCH: "release/v2.0"
+  LIVE_BRANCH: "master"
+  DNS_NAME_DEV: "dev.crmk.online"
+  SSL_PATH_DEV: "/home/crmk/crmk-environment/certbot/conf/live/$DNS_NAME_DEV"
+  DNS_NAME_STAGE: "staging.crmk.online"
+  SSL_PATH_STAGE: "/home/crmk/crmk-environment/certbot/conf/live/$DNS_NAME_STAGE"
+  DNS_NAME_LIVE: "www.crmk.online"
+  SSL_PATH_LIVE: "/home/crmk/crmk-environment/certbot/conf/live/$DNS_NAME_LIVE"
+
+build_dev:
+  stage: build
+  before_script:
+    - folder_name=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 20 ; echo '')
+    - echo "$CONTAINER_ENV" > .env_environment
+    - echo "$DEV_ENV" > .env
+    - cd ..; tar -czf crmk-backend.tar.gz ./crmk-backend
+    - scp -o StrictHostKeyChecking=no ./crmk-backend/.env* root@$DEV_SERVER:/home/crmk/tmp
+    - scp -o StrictHostKeyChecking=no crmk-backend.tar.gz root@$DEV_SERVER:/home/crmk/tmp
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "cd /home/crmk/tmp/; mkdir $folder_name; cd $folder_name; tar -xf ../crmk-backend.tar.gz"
+  script:
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "cat $SSL_PATH_DEV/fullchain.pem > /home/crmk/tmp/ssl/fullchain.pem"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "cat $SSL_PATH_DEV/privkey.pem > /home/crmk/tmp/ssl/privkey.pem"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "rm -rf /home/crmk/crmk-environment"
+    # - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "cd /home/crmk/crmk-backend; git checkout develop; git pull"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "git clone -b develop git@git.crmk.online:crmk-media/crmk-environment.git /home/crmk/crmk-environment"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "mv /home/crmk/tmp/.env /home/crmk/crmk-backend/.env"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "mv /home/crmk/tmp/.env_environment /home/crmk/crmk-environment/.env"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "mkdir -p $SSL_PATH_DEV"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "cat /home/crmk/tmp/ssl/fullchain.pem > $SSL_PATH_DEV/fullchain.pem; cat /home/crmk/tmp/ssl/privkey.pem > $SSL_PATH_DEV/privkey.pem"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "cat $SSL_PATH_DEV/fullchain.pem > /home/crmk/crmk-environment/nginx/ssl/fullchain.pem; cat $SSL_PATH_DEV/privkey.pem > /home/crmk/crmk-environment/nginx/ssl/privkey.pem"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "rm -rf /home/crmk/tmp/.env*"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "chown -R www-data:www-data /home/crmk/*"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "if [[ '$(echo $CI_COMMIT_MESSAGE)' == *"rebuild"* ]]; then cd /home/crmk/crmk-environment && docker-compose build workspace; cd /home/crmk/crmk-environment && docker-compose build php-fpm ; else echo "Without rebuild"; fi"
+    # - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "cd /home/crmk/crmk-environment; docker-compose build workspace"
+    # - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "cd /home/crmk/crmk-environment; docker-compose build php-fpm"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "docker stop laradock_workspace_1 || true; docker rm laradock_workspace_1 || true"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "docker stop laradock_php-fpm_1 || true; docker rm laradock_php-fpm_1 || true"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "cd /home/crmk/crmk-environment/; chmod +x ./*.sh; ./sync.sh up"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "docker exec laradock_workspace_1 composer install --optimize-autoloader --no-dev -d /var/www/tmp/$folder_name/crmk-backend/"
+    # - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "chown www-data:www-data -R /home/crmk/tmp/$folder_name/crmk-backend/"
+    # - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "ln -fs /home/crmk/tmp/$folder_name/crmk-backend/* /home/crmk/crmk-backend"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "cp -arf /home/crmk/tmp/$folder_name/crmk-backend/* /home/crmk/crmk-backend/"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "cd /home/crmk/tmp; rm -rf !("$folder_name"|"ssl")"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan optimize:clear"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan migrate"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan db:seed --class=PermissionSeeder"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan permission:cache-reset"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan optimize"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "docker restart laradock_horizon_1"
+    - ssh -o StrictHostKeyChecking=no root@$DEV_SERVER "docker restart laradock_schedule_1"
+    - sh ./crmk-backend/.ci-notify.sh ✅
+  only:
+   - develop
+
+build_stage:
+  stage: build
+  before_script:
+    - folder_name=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 20 ; echo '')
+    - echo "$CONTAINER_ENV" > .env_environment
+    - echo "$STAGE_ENV" > .env
+    - cd ..; tar -czf crmk-backend.tar.gz ./crmk-backend
+    - scp -o StrictHostKeyChecking=no ./crmk-backend/.env* root@$STAGE_SERVER:/home/crmk/tmp
+    - scp -o StrictHostKeyChecking=no crmk-backend.tar.gz root@$STAGE_SERVER:/home/crmk/tmp
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "cd /home/crmk/tmp/; mkdir $folder_name; cd $folder_name; tar -xf ../crmk-backend.tar.gz"
+  script:
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "cat $SSL_PATH_STAGE/fullchain.pem > /home/crmk/tmp/ssl/fullchain.pem || true"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "cat $SSL_PATH_STAGE/privkey.pem > /home/crmk/tmp/ssl/privkey.pem || true"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "rm -rf /home/crmk/crmk-environment"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "git clone -b stage git@git.crmk.online:crmk-media/crmk-environment.git /home/crmk/crmk-environment"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "mv /home/crmk/tmp/.env /home/crmk/crmk-backend/.env"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "mv /home/crmk/tmp/.env_environment /home/crmk/crmk-environment/.env"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "mkdir -p $SSL_PATH_STAGE"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "cat /home/crmk/tmp/ssl/fullchain.pem > $SSL_PATH_STAGE/fullchain.pem; cat /home/crmk/tmp/ssl/privkey.pem > $SSL_PATH_STAGE/privkey.pem"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "cat $SSL_PATH_STAGE/fullchain.pem > /home/crmk/crmk-environment/nginx/ssl/fullchain.pem; cat $SSL_PATH_STAGE/privkey.pem > /home/crmk/crmk-environment/nginx/ssl/privkey.pem"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "rm -rf /home/crmk/tmp/.env*"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "chown -R www-data:www-data /home/crmk/*"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "if [[ '$(echo $CI_COMMIT_MESSAGE)' == *"rebuild"* ]]; then cd /home/crmk/crmk-environment && docker-compose build workspace; cd /home/crmk/crmk-environment && docker-compose build php-fpm ; else echo "Without rebuild"; fi"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "docker stop laradock_workspace_1 || true; docker rm laradock_workspace_1 || true"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "docker stop laradock_php-fpm_1 || true; docker rm laradock_php-fpm_1 || true"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "cd /home/crmk/crmk-environment/; chmod +x ./*.sh; ./sync.sh up"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "docker exec laradock_workspace_1 composer install --optimize-autoloader --no-dev -d /var/www/tmp/$folder_name/crmk-backend/"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "cp -arf /home/crmk/tmp/$folder_name/crmk-backend/* /home/crmk/crmk-backend/"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "cd /home/crmk/tmp; rm -rf !("$folder_name"|"ssl")"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan migrate"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan db:seed --class=PermissionSeeder"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan permission:cache-reset"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan optimize"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "docker restart laradock_horizon_1"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "docker restart laradock_schedule_1"
+    - ssh -o StrictHostKeyChecking=no root@$STAGE_SERVER "docker restart laradock_nginx_1"
+    - sh ./crmk-backend/.ci-notify.sh ✅
+  only:
+   - release/v2.0
+
+build_live:
+  stage: build
+  before_script:
+    - folder_name=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 20 ; echo '')
+    - echo "$CONTAINER_ENV" > .env_environment
+    - echo "$PROD_ENV" > .env
+    - cd ..; tar -czf crmk-backend.tar.gz ./crmk-backend
+    - scp -o StrictHostKeyChecking=no ./crmk-backend/.env* root@$PROD_SERVER:/home/crmk/tmp
+    - scp -o StrictHostKeyChecking=no crmk-backend.tar.gz root@$PROD_SERVER:/home/crmk/tmp
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "cd /home/crmk/tmp/; mkdir $folder_name; cd $folder_name; tar -xf ../crmk-backend.tar.gz"
+  script:
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "cat $SSL_PATH_LIVE/fullchain.pem > /home/crmk/tmp/ssl/fullchain.pem || true"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "cat $SSL_PATH_LIVE/privkey.pem > /home/crmk/tmp/ssl/privkey.pem || true"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "rm -rf /home/crmk/crmk-environment"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "git clone git@git.crmk.online:crmk-media/crmk-environment.git /home/crmk/crmk-environment"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "mv /home/crmk/tmp/.env /home/crmk/crmk-backend/.env"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "mv /home/crmk/tmp/.env_environment /home/crmk/crmk-environment/.env"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "mkdir -p $SSL_PATH_LIVE"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "cat /home/crmk/tmp/ssl/fullchain.pem > $SSL_PATH_LIVE/fullchain.pem; cat /home/crmk/tmp/ssl/privkey.pem > $SSL_PATH_LIVE/privkey.pem"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "cat $SSL_PATH_LIVE/fullchain.pem > /home/crmk/crmk-environment/nginx/ssl/fullchain.pem; cat $SSL_PATH_LIVE/privkey.pem > /home/crmk/crmk-environment/nginx/ssl/privkey.pem"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "rm -rf /home/crmk/tmp/.env*"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "chown -R www-data:www-data /home/crmk/*"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "if [[ '$(echo $CI_COMMIT_MESSAGE)' == *"rebuild"* ]]; then cd /home/crmk/crmk-environment && docker-compose build workspace; cd /home/crmk/crmk-environment && docker-compose build php-fpm ; else echo "Without rebuild"; fi"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker exec laradock_redis_1 redis-cli -h 127.0.0.1 -p 6379 slaveof no one"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker stop laradock_workspace_1 || true; docker rm laradock_workspace_1 || true"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker stop laradock_php-fpm_1 || true; docker rm laradock_php-fpm_1 || true"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "cd /home/crmk/crmk-environment/; chmod +x ./*.sh; ./sync.sh up"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker exec laradock_workspace_1 rm -rf /var/www/tmp/$folder_name/crmk-backend/bootstrap/cache/*"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker exec laradock_workspace_1 rm -rf /var/www/crmk-backend/bootstrap/cache/*"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker exec laradock_workspace_1 composer install --optimize-autoloader --no-dev -d /var/www/tmp/$folder_name/crmk-backend/"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "cp -arf /home/crmk/tmp/$folder_name/crmk-backend/* /home/crmk/crmk-backend/"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "cd /home/crmk/tmp; rm -rf !("$folder_name"|"ssl")"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan migrate"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan db:seed --class=PermissionSeeder"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan permission:cache-reset"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker exec laradock_workspace_1 php /var/www/crmk-backend/artisan optimize"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker restart laradock_horizon_1"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker restart laradock_schedule_1"
+    - ssh -o StrictHostKeyChecking=no root@$PROD_SERVER "docker restart laradock_nginx_1"
+    - sh ./crmk-backend/.ci-notify.sh ✅
+  only:
+   - master
+
+notify_error:
+  stage: notify
+  script:
+  - sh .ci-notify.sh ❌
+  when: on_failure

@@ -1,0 +1,1935 @@
+openapi: 3.0.1
+info:
+  title: crmk-v1
+  version: '1.0'
+  description: CRMK
+  contact:
+    name: CRMK Api
+    url: 'https://crmk.online'
+    email: support@crmk.online
+servers:
+  - url: 'https://api.crmk.online/api'
+tags:
+  - name: Auth
+  - name: User
+  - name: Permission
+  - name: Telegram bot
+  - name: Content chain
+  - name: Content
+  - name: Sticker set
+  - name: Channel
+  - name: Post
+  - name: Language
+  - name: Category
+  - name: Character
+  - name: Schedule
+  - name: Chat
+paths:
+  /users:
+    get:
+      summary: Get users list
+      description: Get users list
+      tags:
+        - User
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+  '/users/{user_id}':
+    get:
+      summary: Get user
+      description: Get user
+      tags:
+        - User
+      parameters:
+        - schema:
+            type: integer
+          name: user_id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            applicatio/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      summary: Delete user
+      description: Delete user
+      tags:
+        - User
+      parameters:
+        - schema:
+            type: integer
+          name: user_id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: OK
+  /users/invite:
+    post:
+      summary: Send invite to user
+      description: Send invite to user
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: OK
+  /users/acceptInvite:
+    post:
+      summary: Accept invite from user
+      description: Accept invite from user
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                token:
+                  type: string
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+  /permissions:
+    get:
+      summary: 'Get permissions'
+      description: 'Get permissions'
+      tags:
+        - Permission
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Permission'
+  /permissions/roles:
+    get:
+      summary: 'Get roles with permissions'
+      description: 'Get roles with permissions'
+      tags:
+        - Permission
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Role'
+    post:
+      summary: Create role
+      description: Create role
+      tags:
+        - Permission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+  '/permissions/roles/{role_id}/users/{user_id}/assign':
+    post:
+      summary: Assign role to user
+      description: Assign role to user
+      tags:
+        - Permission
+      parameters:
+        - schema:
+            type: integer
+          name: role_id
+          in: path
+          required: true
+        - schema:
+            type: integer
+          name: user_id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  '/permissions/{permission_id}/roles/{role_id}/assign':
+    post:
+      summary: Assign permission to role
+      description: Assign permission to role
+      tags:
+        - Permission
+      parameters:
+        - schema:
+            type: integer
+          name: permission_id
+          in: path
+          required: true
+        - schema:
+            type: integer
+          name: role_id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+  '/permissions/{permission_id}/users/{user_id}/assign':
+    post:
+      summary: Assign permission to user
+      description: Assign permission to user
+      tags:
+        - Permission
+      parameters:
+        - schema:
+            type: integer
+          name: permission_id
+          in: path
+          required: true
+        - schema:
+            type: integer
+          name: user_id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  '/permissions/roles/{role_id}/users/{user_id}/detach':
+    post:
+      summary: Detach role from user
+      description: Detach role from user
+      tags:
+        - Permission
+      parameters:
+        - schema:
+            type: integer
+          name: role_id
+          in: path
+          required: true
+        - schema:
+            type: integer
+          name: user_id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  '/permissions/{permission_id}/roles/{role_id}/detach':
+    post:
+      summary: Detach permission from role
+      description: Detach permission from role
+      tags:
+        - Permission
+      parameters:
+        - schema:
+            type: integer
+          name: permission_id
+          in: path
+          required: true
+        - schema:
+            type: integer
+          name: role_id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+  '/permissions/{permission_id}/users/{user_id}/detach':
+    post:
+      summary: Detach permission from user
+      description: Detach permission from user
+      tags:
+        - Permission
+      parameters:
+        - schema:
+            type: integer
+          name: permission_id
+          in: path
+          required: true
+        - schema:
+            type: integer
+          name: user_id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /login:
+    post:
+      summary: Login to app
+      description: Login to app
+      tags:
+        - Auth
+      operationId: post-login
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+  /logout:
+    post:
+      summary: Logout from app
+      description: Logout from app
+      tags:
+        - Auth
+      operationId: post-logout
+      responses:
+        '201':
+          description: Logged out
+  /logoutFromAll:
+    post:
+      summary: Logout from all devices
+      description: Logout from all devices
+      tags:
+        - Auth
+      operationId: post-logout-from-all
+      responses:
+        '201':
+          description: Logged out
+  /telegram/bots:
+    get:
+      summary: Your GET endpoint
+      description: Get telegram bots
+      tags:
+        - Telegram bot
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TelegramBot'
+      operationId: get-telegram-bots
+    post:
+      summary: ''
+      description: Create telegram bot
+      tags:
+        - Telegram bot
+      operationId: post-telegram-bots
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramBot'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelegramBot'
+  '/telegram/bots/{telegram_bot_uuid}':
+    parameters:
+      - schema:
+          type: string
+        name: telegram_bot_uuid
+        in: path
+        required: true
+    patch:
+      tags:
+        - Telegram bot
+      summary: ''
+      description: Update telegram bot
+      operationId: patch-telegram-bots-telegram_bot_uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramBot'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelegramBot'
+    delete:
+      summary: ''
+      description: Delete telegram bot
+      tags:
+        - Telegram bot
+      operationId: delete-telegram-bots-telegram_bot_uuid
+      responses:
+        '200':
+          description: OK
+  '/telegram/bots/{telegram_bot_uuid}/chains':
+    get:
+      summary: Your GET endpoint
+      description: Get chains
+      operationId: getChains
+      tags:
+        - Content chain
+      parameters:
+        - in: path
+          name: telegram_bot_uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Return only for current telegram bot
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ContentChain'
+    post:
+      summary: ''
+      description: Create chain
+      tags:
+        - Content chain
+      operationId: post-content-chains
+      parameters:
+        - in: path
+          name: telegram_bot_uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Return only for current telegram bot
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentChain'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentChain'
+  '/telegram/bots/{telegram_bot_uuid}/chains/{chain_uuid}':
+    patch:
+      summary: ''
+      description: Update chain
+      operationId: patch-content-chains-content_chain_uuid
+      tags:
+        - Content chain
+      parameters:
+        - in: path
+          name: telegram_bot_uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Return only for current telegram bot
+        - in: path
+          name: chain_uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ContentChain'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentChain'
+    delete:
+      summary: ''
+      description: Delete chain
+      operationId: delete-content-chains-content_chain_uuid
+      tags:
+        - Content chain
+      parameters:
+        - in: path
+          name: telegram_bot_uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Return only for current telegram bot
+        - in: path
+          name: chain_uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: ''
+      responses:
+        '200':
+          description: OK
+  '/chains/{chain_uuid}/content':
+    parameters:
+      - schema:
+          type: string
+        name: chain_uuid
+        in: path
+        required: true
+    get:
+      summary: ''
+      description: Get content
+      tags:
+        - Content
+      operationId: get-chains-chain_uuid-content
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Content'
+    post:
+      tags:
+        - Content
+      summary: ''
+      operationId: post-content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+                format:
+                  type: string
+                type:
+                  type: string
+                stickers:
+                  type: array
+                  items:
+                    type: string
+                buttons:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Button'
+                attachments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      file_id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+      description: Create content
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Content'
+  '/chains/{chain_uuid}/content/reorder':
+    parameters:
+      - schema:
+          type: string
+        name: chain_uuid
+        in: path
+        required: true
+    post:
+      summary: ''
+      operationId: createContent
+      tags:
+        - Content
+      description: Reorder messages in chain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reordered:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      order:
+                        type: integer
+      responses:
+        '200':
+          description: Paginated list of reordered messages
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Content'
+  '/chains/{chain_uuid}/content/{content_uuid}':
+    parameters:
+      - schema:
+          type: string
+        name: chain_uuid
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: content_uuid
+        in: path
+        required: true
+    patch:
+      summary: ''
+      description: Update content
+      tags:
+        - Content
+      operationId: patch-content-content_uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Content'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+                format:
+                  type: string
+                type:
+                  type: string
+                stickers:
+                  type: array
+                  items:
+                    type: string
+                buttons:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Button'
+                attachments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      file_id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+    delete:
+      summary: ''
+      description: Delete content
+      tags:
+        - Content
+      operationId: delete-content-content_uuid
+      responses:
+        '200':
+          description: OK
+  /channels:
+    get:
+      summary: Your GET endpoint
+      description: Get channels
+      tags:
+        - Channel
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Channel'
+      operationId: get-channels
+    post:
+      summary: Create channel
+      description: Create channel
+      tags:
+        - Channel
+      operationId: post-channels
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                telegram_id:
+                  type: string
+                title:
+                  type: string
+                only_unique_content:
+                  type: boolean
+                language_id:
+                  type: string
+                  format: uuid
+                external_link:
+                  type: string
+                  format: uri
+                characters:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                posters:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                managers:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+  '/channels/{channel_uuid}':
+    parameters:
+      - schema:
+          type: string
+        name: channel_uuid
+        in: path
+        required: true
+    patch:
+      tags:
+        - Channel
+      summary: ''
+      description: Update channel
+      operationId: patch-channels-channel_uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Channel'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                telegram_id:
+                  type: string
+                title:
+                  type: string
+                only_unique_content:
+                  type: boolean
+                language_id:
+                  type: string
+                  format: uuid
+                external_link:
+                  type: string
+                  format: uri
+                characters:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                posters:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                managers:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+    delete:
+      summary: ''
+      description: Delete channel
+      tags:
+        - Channel
+      operationId: delete-channels-channel_uuid
+      responses:
+        '200':
+          description: OK
+  '/channels/{channel_uuid}/schedule':
+    parameters:
+      - schema:
+          type: string
+        name: channel_uuid
+        in: path
+        required: true
+      - schema:
+          type: string
+          format: date
+        name: month
+        in: query
+        required: true
+    get:
+      summary: Your GET endpoint
+      description: Get schedule
+      tags:
+        - Schedule
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleTime'
+      operationId: get-schedule
+  '/channels/{channel_uuid}/scheduleTimes':
+    parameters:
+      - schema:
+          type: string
+        name: channel_uuid
+        in: path
+        required: true
+    post:
+      summary: Create schedule
+      description: Create schedule
+      tags:
+        - Schedule
+      operationId: post-schedule-time
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleTime'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                time:
+                  type: string
+                  format: date-time
+                category_id:
+                  type: string
+                  format: uuid
+  '/channels/{channel_uuid}/scheduleTimes/{scheduleTime_uuid}':
+    parameters:
+      - schema:
+          type: string
+        name: channel_uuid
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: scheduleTime_uuid
+        in: path
+        required: true
+    patch:
+      summary: Update schedule
+      description: Update schedule
+      tags:
+        - Schedule
+      operationId: patch-schedule-time
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleTime'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                time:
+                  type: string
+                  format: date-time
+                category_id:
+                  type: string
+                  format: uuid
+    delete:
+      summary: ''
+      description: Delete schedule time
+      tags:
+        - Schedule
+      operationId: delete-schedule-schedule_uuid
+      responses:
+        '200':
+          description: OK
+  /posts:
+    get:
+      summary: ''
+      description: Get posts
+      tags:
+        - Post
+      operationId: get-posts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Post'
+    post:
+      tags:
+        - Post
+      summary: ''
+      operationId: post-post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                language_id:
+                  type: string
+                  format: uuid
+                category_id:
+                  type: string
+                  format: uuid
+                character_id:
+                  type: string
+                  format: uuid
+                title:
+                  type: string
+                body:
+                  type: string
+                format:
+                  type: string
+                type:
+                  type: string
+                stickers:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                buttons:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Button'
+                attachments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      file_id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+      description: Create post
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+  '/posts/{post_uuid}':
+    parameters:
+      - schema:
+          type: string
+        name: post_uuid
+        in: path
+        required: true
+    patch:
+      summary: ''
+      description: Update post
+      tags:
+        - Post
+      operationId: patch-post-post_uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Post'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                language_id:
+                  type: string
+                  format: uuid
+                category_id:
+                  type: string
+                  format: uuid
+                character_id:
+                  type: string
+                  format: uuid
+                title:
+                  type: string
+                body:
+                  type: string
+                format:
+                  type: string
+                type:
+                  type: string
+                stickers:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                buttons:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Button'
+                attachments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      file_id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+    delete:
+      summary: ''
+      description: Delete post
+      tags:
+        - Post
+      operationId: delete-post-post_uuid
+      responses:
+        '200':
+          description: OK
+  /languages:
+    get:
+      summary: Your GET endpoint
+      description: Get languages
+      tags:
+        - Language
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Language'
+      operationId: get-languages
+    post:
+      summary: ''
+      description: Create language
+      tags:
+        - Language
+      operationId: post-language
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Language'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Language'
+  '/languages/{language_uuid}':
+    parameters:
+      - schema:
+          type: string
+        name: language_uuid
+        in: path
+        required: true
+    patch:
+      tags:
+        - Language
+      summary: ''
+      description: Update language
+      operationId: patch-languages-language_uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Language'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Language'
+    delete:
+      summary: ''
+      description: Delete language
+      tags:
+        - Language
+      operationId: delete-languages-language_uuid
+      responses:
+        '200':
+          description: OK
+  /categories:
+    get:
+      summary: Your GET endpoint
+      description: Get categories
+      tags:
+        - Category
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Category'
+      operationId: get-categories
+    post:
+      summary: ''
+      description: Create category
+      tags:
+        - Category
+      operationId: post-category
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+  '/categories/{category_uuid}':
+    parameters:
+      - schema:
+          type: string
+        name: category_uuid
+        in: path
+        required: true
+    patch:
+      tags:
+        - Category
+      summary: ''
+      description: Update category
+      operationId: patch-categories-category_uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Category'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+    delete:
+      summary: ''
+      description: Delete category
+      tags:
+        - Category
+      operationId: delete-categories-category_uuid
+      responses:
+        '200':
+          description: OK
+  /characters:
+    get:
+      summary: Your GET endpoint
+      description: Get characters
+      tags:
+        - Character
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Character'
+      operationId: get-characters
+    post:
+      summary: ''
+      description: Create character
+      tags:
+        - Character
+      operationId: post-character
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Character'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Character'
+  '/characters/{character_uuid}':
+    parameters:
+      - schema:
+          type: string
+        name: character_uuid
+        in: path
+        required: true
+    patch:
+      tags:
+        - Character
+      summary: ''
+      description: Update character
+      operationId: patch-characters-character_uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Character'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Character'
+    delete:
+      summary: ''
+      description: Delete character
+      tags:
+        - Character
+      operationId: delete-characters-character_uuid
+      responses:
+        '200':
+          description: OK
+  /stickerSets:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - Sticker set
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StickerSet'
+      operationId: get-sticker-sets
+    post:
+      summary: ''
+      tags:
+        - Sticker set
+      operationId: post-sticker-sets
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StickerSet'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                set_name:
+                  type: string
+  '/stickerSets/{sticker_set_uuid}':
+    parameters:
+      - schema:
+          type: string
+        name: sticker_set_uuid
+        in: path
+        required: true
+    patch:
+      tags:
+        - Sticker set
+      summary: ''
+      operationId: patch-sticker-sets-sticker_set_uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StickerSet'
+  /customers:
+    summary: Customers API
+    description: Customers API
+    get:
+      summary: Get Customers
+      description: Get Customers
+      operationId: get-customers
+      tags:
+        - Chat
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TelegramUser'
+  /customers/{customer}/chats:
+    summary: Customers API
+    description: Customers API
+    parameters:
+      - schema:
+          type: string
+        name: customer_uuid
+        in: path
+        required: true
+    get:
+      summary: Get Chats
+      description: Get Chats
+      operationId: get-chats
+      tags:
+        - Chat
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Chat'
+  /chats/{chat}/messages:
+    summary: Messages API
+    description: Messages API
+    parameters:
+      - schema:
+          type: string
+        name: chat_uuid
+        in: path
+        required: true
+    get:
+      summary: Get messages
+      description: Get messages
+      operationId: get-messages
+      tags:
+        - Chat
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginationType'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Update'
+    post:
+      summary: Send Message
+      description: Send Message
+      operationId: send-message
+      tags:
+        - Chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                sticker_id:
+                  type: string
+                  format: uuid
+                attachments:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Attachment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Update'
+    patch:
+      summary: Edit Message
+      description: Edit Message
+      operationId: edit-message
+      tags:
+        - Chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                file_id:
+                  type: string
+                  format: uuid
+                type:
+                  type: string
+                caption:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Update'
+components:
+  schemas:
+    Permission:
+      title: Permission
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    Role:
+      title: Role
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+    User:
+      title: User
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+    TelegramBot:
+      title: TelegramBot
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        token:
+          type: string
+    Channel:
+      title: Channel
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        telegram_id:
+          type: string
+        title:
+          type: string
+        only_unique_content:
+          type: boolean
+        language_id:
+          type: string
+          format: uuid
+        external_link:
+          type: string
+          format: uri
+        characters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Character'
+        language:
+          $ref: '#/components/schemas/Language'
+        posters:
+          type: array
+          items:
+            $ref: '#/components/schemas/TelegramBot'
+        managers:
+          type: array
+          items:
+            $ref: '#/components/schemas/TelegramBot'
+    Content:
+      title: Content
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        format:
+          type: string
+        stickers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sticker'
+        buttons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Button'
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+    Post:
+      title: Post
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        language_id:
+          type: string
+          format: uuid
+        category_id:
+          type: string
+          format: uuid
+        character_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        body:
+          type: string
+        format:
+          type: string
+        type:
+          type: string
+        is_unique:
+          type: boolean
+        schedule_times_count:
+          type: integer
+        stickers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sticker'
+        buttons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Button'
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+    ContentChain:
+      title: ContentChain
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        is_active:
+          type: boolean
+        telegram_bot_id:
+          type: string
+        time_from:
+          type: string
+        time_to:
+          type: string
+    Button:
+      title: Button
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+        text:
+          type: string
+    Attachment:
+      title: Attachment
+      type: object
+      properties:
+        id:
+          type: string
+        file_path:
+          type: string
+        type:
+          type: string
+        file_url:
+          type: string
+        caption:
+          type: string
+    StickerSet:
+      title: StickerSet
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        title:
+          type: string
+        is_animated:
+          type: boolean
+        contains_masks:
+          type: boolean
+        stickers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sticker'
+    Sticker:
+      title: Sticker
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        width:
+          type: integer
+        height:
+          type: integer
+        emoji:
+          type: string
+        set_name:
+          type: string
+        is_animated:
+          type: boolean
+        file_id:
+          type: string
+        file_unique_id:
+          type: string
+        file_size:
+          type: integer
+        file_url:
+          type: string
+    Language:
+      title: Language
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        code:
+          type: string
+    Category:
+      title: Category
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+    Character:
+      title: Character
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+    ScheduleTime:
+      title: ScheduleTime
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        time:
+          type: string
+          format: date-time
+        channel_id:
+          type: string
+          format: uuid
+        post_id:
+          type: string
+          format: uuid
+        schedule_day_id:
+          type: string
+          format: uuid
+        category_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        status_code:
+          type: integer
+        category:
+          $ref: '#/components/schemas/Category'
+        post:
+          $ref: '#/components/schemas/Post'
+    PaginationType:
+      type: object
+      properties:
+        current_page:
+          type: number
+        first_page_url:
+          type: string
+        from:
+          type: number
+        last_page:
+          type: number
+        last_page_url:
+          type: string
+        next_page_url:
+          type: string
+        path:
+          type: string
+        per_page:
+          type: number
+        prev_page_url:
+          type: string
+        to:
+          type: number
+        total:
+          type: number
+    TelegramUser:
+      title: TelegramUser
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        telegram_user_id:
+          type: integer
+        is_bot:
+          type: boolean
+        first_name:
+          type: string
+        last_name:
+          type: string
+        language_code:
+          type: string
+        username:
+          type: string
+    Chat:
+      title: Chat
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        manager:
+          $ref: '#/components/schemas/TelegramBot'
+        customer:
+          $ref: '#/components/schemas/TelegramUser'
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Update'
+    Update:
+      title: Update
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        text:
+          type: string
+        media_group_id:
+          type: number
+        date:
+          type: string
+          format: datetime
+        from:
+          $ref: '#/components/schemas/TelegramUser'
+        to:
+          $ref: '#/components/schemas/TelegramUser'
+        original:
+          type: object
+        chat_id:
+          type: number
+        edit_date:
+          type: string
+          format: datetima
+        sticker:
+          $ref: '#/components/schemas/Sticker'
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+        user:
+          $ref: '#/components/schemas/User'

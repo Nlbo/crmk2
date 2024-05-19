@@ -1,0 +1,50 @@
+<div class="P-container">
+  <div class="P-card">
+    <div class="P-logo-section">
+      <img src="assets/images/logo.svg">
+      <div class="P-logo-text">
+        <h4>{{ 'loginToYourAccount' | translate }}</h4>
+        <span>{{ 'yourCredentials' | translate }}</span>
+      </div>
+    </div>
+    <div class="P-form-section">
+
+      <form nz-form [formGroup]="validateForm" class="login-form" (ngSubmit)="login()">
+        <nz-form-item>
+          <nz-form-control [nzErrorTip]="'theInputIsNotValidEmail' | translate">
+            <nz-input-group nzPrefixIcon="user">
+              <input type="text" nz-input formControlName="email" [placeholder]="'emailAddress' | translate"/>
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-control [nzErrorTip]="'pleaseInputYourPassword' | translate">
+            <nz-input-group nzPrefixIcon="lock" [nzSuffix]="suffixTemplate">
+              <input [type]="passwordVisible ? 'text' : 'password'" nz-input formControlName="password"
+                     [placeholder]="'password' | translate"/>
+            </nz-input-group>
+            <ng-template #suffixTemplate>
+              <i nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+                 (click)="passwordVisible = !passwordVisible"></i>
+            </ng-template>
+          </nz-form-control>
+        </nz-form-item>
+        <div nz-row class="login-form-margin">
+<!--          <div nz-col [nzSpan]="12">-->
+<!--            <label nz-checkbox formControlName="remember">-->
+<!--            <label nz-checkbox>-->
+<!--              <span>{{ 'rememberMe' | translate }}</span>-->
+<!--            </label>-->
+<!--          </div>-->
+<!--          <div nz-col [nzSpan]="12">-->
+<!--            <a class="login-form-forgot">{{ 'forgotPassword' | translate }}</a>-->
+<!--          </div>-->
+        </div>
+        <button nz-button class="login-form-button login-form-margin" [disabled]="isSubmitting$ | async"
+                [nzType]="'primary'">{{ 'logIn' | translate }}
+        </button>
+      </form>
+
+    </div>
+  </div>
+</div>

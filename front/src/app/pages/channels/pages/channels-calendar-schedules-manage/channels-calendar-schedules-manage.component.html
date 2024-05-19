@@ -1,0 +1,20 @@
+<form nz-form [formGroup]="formGroup" [nzLayout]="'vertical'">
+  <div class="G-flex-justify-between">
+    <nz-form-item class="G-w-100p">
+      <nz-form-label nzRequired>{{ 'category' | translate }}</nz-form-label>
+      <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+        <nz-select nzShowSearch nzPlaceHolder="Select a series" formControlName="category_id">
+          <nz-option *ngFor="let category of categoriesList" [nzValue]="category.id" [nzLabel]="category.title"></nz-option>
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+  <div class="G-flex-justify-between">
+    <nz-form-item class="G-w-100p">
+      <nz-form-label>{{'time' | translate}}</nz-form-label>
+      <nz-form-control nzHasFeedback [nzErrorTip]="'requiredTitle' | translate">
+        <nz-time-picker [nzMinuteStep]="15" class="G-w-100p" [formControl]="timeFormControl" [nzDefaultOpenValue]="defaultOpenValue" nzFormat="HH:mm"></nz-time-picker>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+</form>

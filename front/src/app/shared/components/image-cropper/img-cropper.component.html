@@ -1,0 +1,28 @@
+<div class="P-modal-container">
+  <nz-modal
+    class="G-flex-center-center"
+    [nzWidth]="800"
+    nzWrapClassName="vertical-center-modal"
+    [(nzVisible)]="flag"
+    (nzOnCancel)="handleCancel()"
+    (nzOnOk)="handleOk()">
+    <div class="P-image-cropper-body G-flex-center-center">
+      <image-cropper
+        [imageChangedEvent]="imageChangedEvent"
+        [maintainAspectRatio]="true"
+        [aspectRatio]="582 / 522"
+        [resizeToWidth]="580"
+        [resizeToHeight]="520"
+        format="png"
+        (imageCropped)="imageCropped($event)"
+        (imageLoaded)="imageLoaded()"
+        (cropperReady)="cropperReady()"
+        (loadImageFailed)="loadImageFailed()">
+      </image-cropper>
+    </div>
+    <div *ngIf="showLinkInput" class="G-mt-10px G-flex-justify-between G-flex-align-center">
+      <span class="G-mr-10px G-bold">{{'link' | translate}}: </span>
+      <input nz-input [placeholder]="'link' | translate" [(ngModel)]="link">
+    </div>
+  </nz-modal>
+</div>

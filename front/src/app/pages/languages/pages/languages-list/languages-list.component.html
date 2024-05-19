@@ -1,0 +1,92 @@
+<div class="G-flex-center-between G-mb-20px">
+  <h2>
+    {{'languages' | translate}} {{ 'total' | translate }}: {{ languagesResponse?.total }}
+  </h2>
+</div>
+<nz-table #nzTable
+          [nzScroll]="{ x: '1100px' }"
+          nzShowPagination
+          [nzData]="languagesList"
+          nzTableLayout="fixed"
+          [nzPageSize]="pageSize"
+          [nzTotal]="languagesResponse?.total"
+          [nzFrontPagination]="false"
+          (nzPageIndexChange)="pageIndex = $event;initializeValues()"
+          [nzPageIndex]="pageIndex">
+  <thead>
+  <tr>
+    <th nzCustomFilter>
+      <nz-filter-trigger
+        [(nzVisible)]="visibleTitleFilter"
+        [nzActive]="languagesService.titleFilter.length > 0"
+        [nzDropdownMenu]="titleFilter">
+        <i nz-icon nzType="search"></i>
+      </nz-filter-trigger>
+      {{'title' | translate}}
+    </th>
+    <th nzCustomFilter>
+      <nz-filter-trigger
+        [(nzVisible)]="visibleCodeFilter"
+        [nzActive]="languagesService.codeFilter.length > 0"
+        [nzDropdownMenu]="codeFilter">
+        <i nz-icon nzType="search"></i>
+      </nz-filter-trigger>
+      {{'code' | translate}}
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let language of nzTable.data">
+    <td nzEllipsis [nz-tooltip]="language.title">{{ language.title }}</td>
+    <td nzEllipsis [nz-tooltip]="language.code">{{ language.code }}</td>
+  </tr>
+  </tbody>
+</nz-table>
+
+<nz-dropdown-menu #titleFilter="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown">
+    <div class="search-box">
+      <input
+        type="text"
+        nz-input
+        [placeholder]="'searchTitle' | translate"
+        [(ngModel)]="languagesService.titleFilter"
+        (keydown.enter)="pageIndex = 0;initializeValues()">
+      <button nz-button nzSize="small"
+              nzType="primary"
+              (click)="pageIndex = 0;
+               initializeValues()"
+              class="search-button">
+        {{ 'search' | translate }}
+      </button>
+      <button
+        nz-button
+        nzSize="small"
+        (click)="languagesService.titleFilter = '';initializeValues()">{{ 'reset' | translate }}</button>
+    </div>
+  </div>
+</nz-dropdown-menu>
+
+<nz-dropdown-menu #codeFilter="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown">
+    <div class="search-box">
+      <input
+        type="text"
+        nz-input
+        [placeholder]="'searchCode' | translate"
+        [(ngModel)]="languagesService.codeFilter"
+        (keydown.enter)="pageIndex = 0;initializeValues()">
+      <button nz-button nzSize="small"
+              nzType="primary"
+              (click)="pageIndex = 0;
+               initializeValues()"
+              class="search-button">
+        {{ 'search' | translate }}
+      </button>
+      <button
+        nz-button
+        nzSize="small"
+        (click)="languagesService.codeFilter = '';initializeValues()">{{ 'reset' | translate }}</button>
+    </div>
+  </div>
+</nz-dropdown-menu>
