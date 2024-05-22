@@ -41,7 +41,7 @@ services:
       - app-network
   redis:
     platform: linux/amd64
-    command: redis-server --requirepass password
+    command: redis-server
     volumes:
       - ./redis:/data
     image: 'redis:latest'

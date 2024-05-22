@@ -90,7 +90,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     DatePipe,
     TranslatePipe,
     NzMessageService,
-    Overlay
+    Overlay,
   ],
   bootstrap: [AppComponent]
 })
